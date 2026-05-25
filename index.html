@@ -777,12 +777,100 @@ const CONFIG = {
   OBA_KEY:        'TEST',          // register at developer.onebusaway.org for higher limits
   SUPABASE_URL:   '',              // https://scsdstpabzkiqnvsskts.supabase.co/rest/v1/
   SUPABASE_ANON_KEY: '',           // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNjc2RzdHBhYnpraXFudnNza3RzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MTUxNzcsImV4cCI6MjA5NTI5MTE3N30.HMo41UCsWsCwk75GxoujLcIlwlZDhXPNnLZ1x7K8VV8paste your Supabase anon/public key here
-  LAT: 47.6062,
-  LON: -122.3321,
   REFRESH_WEATHER_MS:   5 * 60 * 1000,
   REFRESH_TT_MS:        2 * 60 * 1000,
   REFRESH_INCIDENTS_MS: 2 * 60 * 1000,
   REFRESH_FERRY_MS:     2 * 60 * 1000,
+};
+
+// ══ CITY CONFIG — swap this block to deploy for a new city ══
+const CITY_CONFIG = {
+  name:            'Seattle',
+  displayLabel:    'Seattle',
+  tagline:         'See · Plan · Move',
+  lat:              47.6062,
+  lon:             -122.3321,
+  timezone:        'America/Los_Angeles',
+
+  // NWS active alerts — computed from lat/lon via api.weather.gov/alerts/active?point=
+  nwsNoAlertsArea: 'Seattle area',
+
+  // NOAA tide station
+  tideStationId:   '9447130',
+  tideLabel:       'Elliott Bay · MLLW datum',
+
+  // OneBusAway transit agency (40 = Sound Transit / Puget Sound)
+  obaBaseUrl:      'https://api.pugetsound.onebusaway.org/api/where',
+  transitAgencyId: '40',
+
+  // Airport (FAA NAS Status XML — IATA code used to match <ARPT> nodes)
+  airportCode:     'SEA',
+  airportName:     'SEA-TAC',
+
+  // SFD / 911 dispatch — Seattle Open Data (Socrata)
+  sfdUrl:          'https://data.seattle.gov/resource/kzjm-xkqj.json',
+
+  // Supabase condition_snapshots location key
+  snapshotLocationKey: 'SEA-TAC',
+
+  // Sports teams (ESPN public schedule API)
+  teams: [
+    { name:'Mariners', sport:'baseball',   league:'mlb',   id:'28',   color:'#00685a', venue:'T-Mobile Park',        impact:'high'   },
+    { name:'Seahawks', sport:'football',   league:'nfl',   id:'26',   color:'#69be28', venue:'Lumen Field',           impact:'high'   },
+    { name:'Sounders', sport:'soccer',     league:'usa.1', id:'9726', color:'#5d9741', venue:'Lumen Field',           impact:'high'   },
+    { name:'Kraken',   sport:'hockey',     league:'nhl',   id:'55',   color:'#68a2b9', venue:'Climate Pledge Arena',  impact:'medium' },
+    { name:'Storm',    sport:'basketball', league:'wnba',  id:'14',   color:'#2c5234', venue:'Climate Pledge Arena',  impact:'medium' },
+  ],
+
+  // WSDOT scenic camera filter — ferry terminal feeds
+  cameraRoadName:      'Ferries',
+  cameraLatMin:         47.00,
+  cameraLatMax:         48.90,
+  cameraTerminalOrder: [
+    'bainbridge','winslow','colman','seattle',
+    'mukilteo','clinton',
+    'edmonds','kingston',
+    'fauntleroy','southworth','vashon',
+    'anacortes','orcas','friday harbor','lopez','shaw',
+    'point defiance','tahlequah',
+    'port townsend','coupeville',
+  ],
+
+  // Daily quote pool
+  quotes: [
+    { text:"The earth does not belong to us; we belong to the earth.", attr:"Chief Si'ahl (Chief Seattle), Duwamish Leader, 1854" },
+    { text:"Work hard. Have fun. Make history.", attr:"Jeff Bezos, Amazon Founder — Seattle" },
+    { text:"It's fine to celebrate success, but it is more important to heed the lessons of failure.", attr:"Bill Gates, Microsoft Co-founder — Redmond, WA" },
+    { text:"Knowledge speaks, but wisdom listens.", attr:"Jimi Hendrix, Seattle-born Guitar Legend" },
+    { text:"I'd rather be hated for who I am than loved for who I am not.", attr:"Kurt Cobain, Nirvana — Aberdeen, WA" },
+    { text:"Be like water, my friend.", attr:"Bruce Lee — trained at UW Seattle" },
+    { text:"The separation is in the preparation.", attr:"Russell Wilson, Seattle Seahawks" },
+    { text:"We are not in the coffee business serving people. We are in the people business serving coffee.", attr:"Howard Schultz, Starbucks — Seattle" },
+    { text:"Whatever we do to the web of life, we do to ourselves.", attr:"Chief Si'ahl (Chief Seattle)" },
+    { text:"If you double the number of experiments you do per year, you double your inventiveness.", attr:"Jeff Bezos, Amazon — Seattle" },
+    { text:"Your most unhappy customers are your greatest source of learning.", attr:"Bill Gates, Microsoft — Redmond, WA" },
+    { text:"I've always thought that a big laugh is a really loud noise from the soul saying, 'Ain't that the truth.'", attr:"Quincy Jones, Seattle-raised Music Legend" },
+    { text:"Come as you are.", attr:"Nirvana — Seattle, 1991" },
+    { text:"Dream more than others think practical. Expect more than others think possible.", attr:"Howard Schultz, Starbucks — Seattle" },
+    { text:"To improve is to change; to be perfect is to change often.", attr:"Ichiro Suzuki, Seattle Mariners Legend" },
+    { text:"A goal is not always meant to be reached. It often serves simply as something to aim at.", attr:"Bruce Lee — University of Washington, Seattle" },
+    { text:"Every day is a great day to be a Seahawk.", attr:"Pete Carroll, Seattle Seahawks" },
+    { text:"Rain is just confetti from the sky.", attr:"Seattle Wisdom" },
+    { text:"The salmon don't care what you think of the rain.", attr:"Pacific Northwest Proverb" },
+    { text:"We are all visitors to this time, this place. We are just passing through.", attr:"Chief Si'ahl — Duwamish, Seattle" },
+  ],
+
+  // Coffee shop pool
+  coffeeShops: [
+    { name:'Victrola Coffee',     hood:'Capitol Hill',   specialty:'Single origin espresso' },
+    { name:'Lighthouse Roasters', hood:'Fremont',        specialty:'Classic Pacific roasts'  },
+    { name:'Caffe Vita',          hood:'Pike/Pine',      specialty:'Caffe Vita blend'         },
+    { name:'Elm Coffee Roasters', hood:'Pioneer Square', specialty:'Light roast pour-over'    },
+    { name:'Analog Coffee',       hood:'Capitol Hill',   specialty:'Neighborhood espresso'    },
+    { name:'Stumptown Coffee',    hood:'Downtown',       specialty:'Hair Bender blend'        },
+    { name:'Milstead & Co.',      hood:'Fremont',        specialty:'Rotating guest roasters'  },
+    { name:'Fonte Coffee',        hood:'Belltown',       specialty:'Espresso bar'             },
+  ],
 };
 
 // ╔══════════════════════════════════════════════════════════╗
@@ -879,34 +967,11 @@ function startClock() {
 // ╔══════════════════════════════════════════════════════════╗
 //  DAILY QUOTE
 // ╚══════════════════════════════════════════════════════════╝
-const SEATTLE_QUOTES = [
-  { text:"The earth does not belong to us; we belong to the earth.", attr:"Chief Si'ahl (Chief Seattle), Duwamish Leader, 1854" },
-  { text:"Work hard. Have fun. Make history.", attr:"Jeff Bezos, Amazon Founder — Seattle" },
-  { text:"It's fine to celebrate success, but it is more important to heed the lessons of failure.", attr:"Bill Gates, Microsoft Co-founder — Redmond, WA" },
-  { text:"Knowledge speaks, but wisdom listens.", attr:"Jimi Hendrix, Seattle-born Guitar Legend" },
-  { text:"I'd rather be hated for who I am than loved for who I am not.", attr:"Kurt Cobain, Nirvana — Aberdeen, WA" },
-  { text:"Be like water, my friend.", attr:"Bruce Lee — trained at UW Seattle" },
-  { text:"The separation is in the preparation.", attr:"Russell Wilson, Seattle Seahawks" },
-  { text:"We are not in the coffee business serving people. We are in the people business serving coffee.", attr:"Howard Schultz, Starbucks — Seattle" },
-  { text:"Whatever we do to the web of life, we do to ourselves.", attr:"Chief Si'ahl (Chief Seattle)" },
-  { text:"If you double the number of experiments you do per year, you double your inventiveness.", attr:"Jeff Bezos, Amazon — Seattle" },
-  { text:"Your most unhappy customers are your greatest source of learning.", attr:"Bill Gates, Microsoft — Redmond, WA" },
-  { text:"I've always thought that a big laugh is a really loud noise from the soul saying, 'Ain't that the truth.'", attr:"Quincy Jones, Seattle-raised Music Legend" },
-  { text:"Come as you are.", attr:"Nirvana — Seattle, 1991" },
-  { text:"Dream more than others think practical. Expect more than others think possible.", attr:"Howard Schultz, Starbucks — Seattle" },
-  { text:"To improve is to change; to be perfect is to change often.", attr:"Ichiro Suzuki, Seattle Mariners Legend" },
-  { text:"A goal is not always meant to be reached. It often serves simply as something to aim at.", attr:"Bruce Lee — University of Washington, Seattle" },
-  { text:"Every day is a great day to be a Seahawk.", attr:"Pete Carroll, Seattle Seahawks" },
-  { text:"Rain is just confetti from the sky.", attr:"Seattle Wisdom" },
-  { text:"The salmon don't care what you think of the rain.", attr:"Pacific Northwest Proverb" },
-  { text:"We are all visitors to this time, this place. We are just passing through.", attr:"Chief Si'ahl — Duwamish, Seattle" },
-];
-
 function setDailyQuote() {
   const now   = new Date();
   const start = new Date(now.getFullYear(), 0, 0);
   const doy   = Math.floor((now - start) / 86400000);
-  const q     = SEATTLE_QUOTES[doy % SEATTLE_QUOTES.length];
+  const q     = CITY_CONFIG.quotes[doy % CITY_CONFIG.quotes.length];
   document.getElementById('quote-text').innerHTML =
     `&#8220;${q.text}&#8221; &nbsp;<span class="q-attr">— ${q.attr}</span>`;
 }
@@ -959,18 +1024,18 @@ let transitHasLivePredictions = null; // true/false/null(unknown)
 const _brief = { weather:false, tt:false, ferry:false, transit:false, nws:false, sfd:false, events:false };
 
 async function fetchWeather() {
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.LAT}&longitude=${CONFIG.LON}` +
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${CITY_CONFIG.lat}&longitude=${CITY_CONFIG.lon}` +
     `&current=temperature_2m,precipitation_probability,wind_speed_10m,weather_code,visibility,cloud_cover` +
     `&hourly=temperature_2m,precipitation_probability,wind_speed_10m,weather_code` +
     `&daily=sunrise,sunset` +
-    `&temperature_unit=fahrenheit&wind_speed_unit=mph&forecast_hours=13&forecast_days=1&timezone=America%2FLos_Angeles`;
+    `&temperature_unit=fahrenheit&wind_speed_unit=mph&forecast_hours=13&forecast_days=1&timezone=${encodeURIComponent(CITY_CONFIG.timezone)}`;
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     weatherData = data;
     _brief.weather = true;
-    snapshotCondition('weather', 'SEA-TAC', weatherData.current.temperature_2m, weatherData.current);
+    snapshotCondition('weather', CITY_CONFIG.snapshotLocationKey, weatherData.current.temperature_2m, weatherData.current);
     renderConditions(data);
     renderDriveWindow(data);
     renderCoffee(data);
@@ -1087,13 +1152,13 @@ function aqiLevel(aqi) {
 
 async function fetchAirQuality() {
   const url = `https://air-quality-api.open-meteo.com/v1/air-quality` +
-    `?latitude=${CONFIG.LAT}&longitude=${CONFIG.LON}&current=us_aqi,pm2_5,pm10&domains=cams_global`;
+    `?latitude=${CITY_CONFIG.lat}&longitude=${CITY_CONFIG.lon}&current=us_aqi,pm2_5,pm10&domains=cams_global`;
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     aqiData = data.current;
-    snapshotCondition('aqi', 'SEA-TAC', aqiData.us_aqi ?? 0, aqiData);
+    snapshotCondition('aqi', CITY_CONFIG.snapshotLocationKey, aqiData.us_aqi ?? 0, aqiData);
     const aqi = aqiData?.us_aqi ?? null;
     setDot('aqi-dot', aqi == null ? 'gray' : aqi <= 50 ? 'green' : aqi <= 100 ? 'amber' : 'red');
     // Re-render conditions strip with AQI cells appended
@@ -1107,7 +1172,7 @@ async function fetchAirQuality() {
 //  NWS ACTIVE WEATHER ALERTS (api.weather.gov — no key)
 // ╚══════════════════════════════════════════════════════════╝
 async function fetchNWSAlerts() {
-  const url = `https://api.weather.gov/alerts/active?point=${CONFIG.LAT},${CONFIG.LON}&status=actual`;
+  const url = `https://api.weather.gov/alerts/active?point=${CITY_CONFIG.lat},${CITY_CONFIG.lon}&status=actual`;
   try {
     const res = await fetch(url, { headers:{ Accept:'application/geo+json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -1127,7 +1192,7 @@ async function fetchNWSAlerts() {
 function renderNWSAlerts(alerts) {
   if (!alerts.length) {
     document.getElementById('nws-alerts-list').innerHTML =
-      `<div class="nws-no-alerts"><span class="sev-green">&#10003;</span>&nbsp; No active watches, warnings, or advisories for the Seattle area.</div>`;
+      `<div class="nws-no-alerts"><span class="sev-green">&#10003;</span>&nbsp; No active watches, warnings, or advisories for the ${CITY_CONFIG.nwsNoAlertsArea}.</div>`;
     return;
   }
   const sevOrder = { Extreme:0, Severe:1, Moderate:2, Minor:3, Unknown:4 };
@@ -1178,7 +1243,7 @@ function localDatetimeStr(date) {
 async function fetchSFD() {
   // SFD datetimes are stored in Seattle local time — must compare in local time, not UTC
   const twoHoursAgo = localDatetimeStr(new Date(Date.now() - 2*3600000));
-  const url = `https://data.seattle.gov/resource/kzjm-xkqj.json` +
+  const url = `${CITY_CONFIG.sfdUrl}` +
     `?$where=datetime>'${twoHoursAgo}'&$limit=50&$order=datetime+DESC`;
   try {
     const res = await fetch(url);
@@ -1413,13 +1478,6 @@ function renderFerry(vessels) {
 // ╔══════════════════════════════════════════════════════════╗
 //  SEATTLE EVENTS (ESPN public API — no key required)
 // ╚══════════════════════════════════════════════════════════╝
-const SEATTLE_TEAMS = [
-  { name:'Mariners', sport:'baseball',   league:'mlb',   id:'28',   color:'#00685a', venue:'T-Mobile Park',        impact:'high'   },
-  { name:'Seahawks', sport:'football',   league:'nfl',   id:'26',   color:'#69be28', venue:'Lumen Field',           impact:'high'   },
-  { name:'Sounders', sport:'soccer',     league:'usa.1', id:'9726', color:'#5d9741', venue:'Lumen Field',           impact:'high'   },
-  { name:'Kraken',   sport:'hockey',     league:'nhl',   id:'55',   color:'#68a2b9', venue:'Climate Pledge Arena',  impact:'medium' },
-  { name:'Storm',    sport:'basketball', league:'wnba',  id:'14',   color:'#2c5234', venue:'Climate Pledge Arena',  impact:'medium' },
-];
 
 async function espnFetch(url) {
   // ESPN supports CORS natively — try direct first, proxy fallback
@@ -1437,7 +1495,7 @@ async function fetchEvents() {
   const cutoff = new Date(now.getTime() + 14 * 86400000);
   const all    = [];
 
-  await Promise.allSettled(SEATTLE_TEAMS.map(async team => {
+  await Promise.allSettled(CITY_CONFIG.teams.map(async team => {
     try {
       const data = await espnFetch(
         `https://site.api.espn.com/apis/site/v2/sports/${team.sport}/${team.league}/teams/${team.id}/schedule`
@@ -1527,16 +1585,6 @@ function renderEvents(events) {
 // ╔══════════════════════════════════════════════════════════╗
 //  COFFEE INDEX
 // ╚══════════════════════════════════════════════════════════╝
-const SEATTLE_COFFEE_SHOPS = [
-  { name:'Victrola Coffee',     hood:'Capitol Hill',   specialty:'Single origin espresso' },
-  { name:'Lighthouse Roasters', hood:'Fremont',        specialty:'Classic Pacific roasts'  },
-  { name:'Caffe Vita',          hood:'Pike/Pine',      specialty:'Caffe Vita blend'         },
-  { name:'Elm Coffee Roasters', hood:'Pioneer Square', specialty:'Light roast pour-over'    },
-  { name:'Analog Coffee',       hood:'Capitol Hill',   specialty:'Neighborhood espresso'    },
-  { name:'Stumptown Coffee',    hood:'Downtown',       specialty:'Hair Bender blend'        },
-  { name:'Milstead & Co.',      hood:'Fremont',        specialty:'Rotating guest roasters'  },
-  { name:'Fonte Coffee',        hood:'Belltown',       specialty:'Espresso bar'             },
-];
 
 function renderCoffee(data) {
   const c     = data.current;
@@ -1563,7 +1611,7 @@ function renderCoffee(data) {
   else                   { level='NOMINAL';  levelColor='sev-green'; quip='Walk right up. The barista already knows your order.'; }
 
   const seed = now.getDate() + now.getMonth()*31;
-  const shuffled = [...SEATTLE_COFFEE_SHOPS].sort((a,b) => {
+  const shuffled = [...CITY_CONFIG.coffeeShops].sort((a,b) => {
     const ha = (a.name.charCodeAt(0)*7+seed) % 97;
     const hb = (b.name.charCodeAt(0)*7+seed) % 97;
     return ha - hb;
@@ -1598,7 +1646,7 @@ async function fetchTide() {
   const tomorrow = fmt(new Date(now.getTime() + 86400000));
   const url      = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter` +
     `?begin_date=${today}&end_date=${tomorrow}` +
-    `&station=9447130&product=predictions&datum=MLLW&time_zone=lst_ldt&interval=hilo&units=english` +
+    `&station=${CITY_CONFIG.tideStationId}&product=predictions&datum=MLLW&time_zone=lst_ldt&interval=hilo&units=english` +
     `&application=goatvision_seattle&format=json`;
   try {
     const data = await wsdotFetch(url);
@@ -1643,7 +1691,7 @@ function renderTide(preds) {
       <span class="tide-current">${currentFt}<span class="tide-unit"> ft</span></span>
       <span class="tide-trend ${trendCls}">${trendStr}</span>
     </div>
-    <div style="font-size:9px;color:var(--text-dim);margin-bottom:8px">Elliott Bay · MLLW datum</div>
+    <div style="font-size:9px;color:var(--text-dim);margin-bottom:8px">${CITY_CONFIG.tideLabel}</div>
     <div class="tide-table">${rowsHtml}</div>`;
 }
 
@@ -1694,7 +1742,7 @@ function renderBike(data) {
 // ╔══════════════════════════════════════════════════════════╗
 //  LINK LIGHT RAIL (OneBusAway Puget Sound)
 // ╚══════════════════════════════════════════════════════════╝
-const OBA_BASE = 'https://api.pugetsound.onebusaway.org/api/where';
+const OBA_BASE = CITY_CONFIG.obaBaseUrl;
 
 async function obaFetch(path) {
   const key = CONFIG.OBA_KEY || 'TEST';
@@ -1711,7 +1759,7 @@ let _linkStopCache = new Map();
 
 async function getLinkRoutes() {
   if (_linkRoutes && _linkRoutes.length > 0) return _linkRoutes;
-  const d = await obaFetch('/routes-for-agency/40.json');
+  const d = await obaFetch(`/routes-for-agency/${CITY_CONFIG.transitAgencyId}.json`);
   _linkRoutes = (d.list||[])
     .filter(r => (r.type===0||r.type===1) && /line|link/i.test((r.shortName||'')+' '+(r.longName||'')))
     .sort((a,b) => (a.shortName||'').localeCompare(b.shortName||''));
@@ -1951,24 +1999,15 @@ async function fetchScenicCams() {
 
     const ferry = data.filter(c =>
       c.IsActive && c.ImageURL &&
-      c.CameraLocation?.RoadName === 'Ferries' &&
-      (c.CameraLocation?.Latitude ?? 0) >= 47.00 &&
-      (c.CameraLocation?.Latitude ?? 0) <= 48.90
+      c.CameraLocation?.RoadName === CITY_CONFIG.cameraRoadName &&
+      (c.CameraLocation?.Latitude ?? 0) >= CITY_CONFIG.cameraLatMin &&
+      (c.CameraLocation?.Latitude ?? 0) <= CITY_CONFIG.cameraLatMax
     );
 
     // One per terminal for variety, then fill with any remaining
-    const terminalOrder = [
-      'bainbridge','winslow','colman','seattle',
-      'mukilteo','clinton',
-      'edmonds','kingston',
-      'fauntleroy','southworth','vashon',
-      'anacortes','orcas','friday harbor','lopez','shaw',
-      'point defiance','tahlequah',
-      'port townsend','coupeville',
-    ];
     const seen = new Set();
     const picked = [];
-    for (const kw of terminalOrder) {
+    for (const kw of CITY_CONFIG.cameraTerminalOrder) {
       const cam = ferry.find(c => (c.Title||'').toLowerCase().includes(kw) && !seen.has(c.CameraID));
       if (cam) { picked.push(cam); seen.add(cam.CameraID); }
     }
@@ -2316,7 +2355,7 @@ function renderSeismic() {
 
 async function fetchSeismic() {
   const url = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson` +
-    `&latitude=${CONFIG.LAT}&longitude=${CONFIG.LON}&maxradiuskm=300` +
+    `&latitude=${CITY_CONFIG.lat}&longitude=${CITY_CONFIG.lon}&maxradiuskm=300` +
     `&minmagnitude=1.5&orderby=time&limit=8`;
   try {
     const res = await fetch(url);
@@ -2413,7 +2452,7 @@ async function fetchSEA() {
     for (const dt of xml.querySelectorAll('Delay_type')) {
       const name    = dt.querySelector('Name')?.textContent?.trim() || '';
       const seaNode = [...dt.querySelectorAll('ARPT')].find(a =>
-        a.textContent.trim().toUpperCase() === 'SEA'
+        a.textContent.trim().toUpperCase() === CITY_CONFIG.airportCode
       );
       if (!seaNode) continue;
 
@@ -2429,7 +2468,7 @@ async function fetchSEA() {
 
     if (!delays.length) {
       setDot('sea-dot', 'green');
-      el.innerHTML = `<div class="nws-no-alerts"><span class="sev-green">&#10003;</span>&nbsp; SEA-TAC: No active delays or ground stops.</div>`;
+      el.innerHTML = `<div class="nws-no-alerts"><span class="sev-green">&#10003;</span>&nbsp; ${CITY_CONFIG.airportName}: No active delays or ground stops.</div>`;
     } else {
       setDot('sea-dot', hasGroundStop ? 'red' : 'amber');
       el.innerHTML = delays.map(d => `
