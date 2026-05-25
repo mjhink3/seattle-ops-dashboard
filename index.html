@@ -113,9 +113,6 @@
   .drive-bar.best-window  { box-shadow:0 0 6px var(--green); }
   .drive-bar.worst-window { box-shadow:0 0 6px var(--red); }
 
-  /* ── TWO-COL MID GRID ── */
-  #mid-grid { display:grid; grid-template-columns:1fr 340px; gap:10px; }
-
   /* ── INCIDENTS ── */
   #incidents-list { max-height:320px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:var(--border) transparent; }
   .incident-item { padding:8px 10px; border-bottom:1px solid var(--border); display:grid; grid-template-columns:80px 1fr; gap:6px 10px; align-items:start; }
@@ -128,20 +125,29 @@
   .incident-meta { font-size:9px; color:var(--text-dim); margin-top:2px; }
   .incident-road { font-size:10px; font-weight:600; color:var(--blue); }
 
-  /* ── FERRY ── */
-  .ferry-route { padding:10px; border-bottom:1px solid var(--border); }
-  .ferry-route:last-child { border-bottom:none; }
-  .ferry-route-name { font-size:11px; font-weight:700; color:var(--text-bright); letter-spacing:0.04em; margin-bottom:6px; }
-  .ferry-departures  { display:flex; flex-direction:column; gap:4px; }
-  .ferry-dep { display:flex; justify-content:space-between; align-items:center; padding:4px 8px; background:var(--bg3); border-left:2px solid var(--blue-dim); }
-  .ferry-dep.delayed   { border-left-color:var(--amber); }
-  .ferry-dep.cancelled { border-left-color:var(--red); opacity:0.8; }
-  .ferry-time { font-size:14px; font-weight:700; color:var(--text-bright); }
-  .ferry-status { font-size:9px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; }
-  .ferry-status.on-time  { color:var(--green); }
-  .ferry-status.delayed  { color:var(--amber); }
-  .ferry-status.cancelled{ color:var(--red);   }
-  .ferry-vessel { font-size:9px; color:var(--text-dim); }
+  /* ── FERRY TRACK VISUAL ── */
+  #ferry-routes { display:grid; grid-template-columns:1fr 1fr; }
+  .ferry-route { padding:14px 18px; border-right:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .ferry-route:nth-child(2n)    { border-right:none; }
+  .ferry-route:nth-last-child(-n+2) { border-bottom:none; }
+  .ferry-route-name { font-size:9px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-dim); margin-bottom:10px; }
+  .ferry-vessel-block { margin-bottom:10px; }
+  .ferry-vessel-block:last-child { margin-bottom:0; }
+  .ferry-track-wrap { display:flex; align-items:center; gap:10px; }
+  .ferry-term { font-size:8px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-dim); white-space:nowrap; min-width:52px; }
+  .ferry-term.right { text-align:right; }
+  .ferry-track { flex:1; position:relative; height:30px; }
+  .ferry-track-bg   { position:absolute; left:5px; right:5px; top:50%; transform:translateY(-50%); height:2px; background:var(--border); border-radius:2px; }
+  .ferry-track-fill { position:absolute; left:5px; top:50%; transform:translateY(-50%); height:2px; background:linear-gradient(90deg,var(--blue-dim),var(--blue)); border-radius:2px; transition:width 1.4s ease; }
+  .ferry-dot { position:absolute; width:8px; height:8px; border-radius:50%; background:var(--bg2); border:2px solid var(--text-dim); top:50%; transform:translateY(-50%); }
+  .ferry-dot.start { left:0; }
+  .ferry-dot.end   { right:0; }
+  .ferry-boat { position:absolute; top:50%; transform:translate(-50%,-50%); font-size:20px; line-height:1; transition:left 1.4s ease; filter:drop-shadow(0 0 4px var(--gv-purple)); }
+  .ferry-meta { font-size:9px; color:var(--text-dim); margin-top:4px; padding-left:2px; }
+  .ferry-meta .vname  { color:var(--text-bright); font-weight:600; }
+  .ferry-meta .vonway { color:var(--amber); font-weight:700; }
+  .ferry-meta .vdock  { color:var(--green); font-weight:700; }
+  .ferry-no-data { font-size:9px; color:var(--text-dim); font-style:italic; padding:4px 0; }
 
   /* ── EVENTS ── */
   #events-list { max-height:360px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:var(--border) transparent; }
@@ -267,6 +273,89 @@
   .tm-legend-item { display:flex; align-items:center; gap:5px; font-size:9px; color:var(--text-dim); }
   .tm-swatch { width:22px; height:4px; border-radius:2px; }
 
+  /* ── FOOTER ── */
+  #dashboard-footer {
+    margin: 10px 12px 16px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    padding: 10px 14px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  #dashboard-footer .footer-sources {
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+    line-height: 1.7;
+  }
+  #dashboard-footer .footer-sources strong {
+    color: var(--gv-green);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+  #dashboard-footer .footer-disclaimer {
+    font-size: 9px;
+    color: var(--text-dim);
+    font-style: italic;
+    line-height: 1.6;
+    max-width: 520px;
+    text-align: right;
+  }
+  #dashboard-footer .footer-brand {
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  #dashboard-footer .footer-brand span { color: var(--gv-purple); }
+
+  /* ── NWS ALERTS ── */
+  #nws-alerts-list { }
+  .nws-no-alerts { padding:8px 12px; font-size:10px; color:var(--text-dim); display:flex; align-items:center; gap:6px; }
+  .nws-alert-item { padding:8px 12px; border-bottom:1px solid var(--border); display:grid; grid-template-columns:92px 1fr; gap:6px 10px; align-items:start; }
+  .nws-alert-item:last-child { border-bottom:none; }
+  .nws-sev-badge { font-size:8px; font-weight:700; letter-spacing:0.1em; padding:2px 5px; text-transform:uppercase; text-align:center; border:1px solid; }
+  .nws-extreme { color:#ffe600; border-color:#ffe600; background:rgba(255,230,0,0.08); }
+  .nws-severe  { color:var(--red);   border-color:var(--red);   background:rgba(230,57,70,0.1); }
+  .nws-moderate{ color:var(--amber); border-color:var(--amber); background:rgba(240,165,0,0.1); }
+  .nws-minor   { color:var(--blue);  border-color:var(--blue);  background:rgba(119,68,242,0.08); }
+  .nws-event   { font-size:11px; font-weight:700; color:var(--text-bright); }
+  .nws-headline{ font-size:10px; color:var(--text); margin-top:2px; line-height:1.5; }
+  .nws-meta    { font-size:9px; color:var(--text-dim); margin-top:3px; }
+
+  /* ── SFD DISPATCHES ── */
+  #sfd-summary { display:flex; flex-wrap:wrap; border-bottom:1px solid var(--border); }
+  .sfd-type-cell { flex:1; min-width:90px; padding:8px 12px; border-right:1px solid var(--border); text-align:center; }
+  .sfd-type-cell:last-child { border-right:none; }
+  .sfd-type-count { font-size:22px; font-weight:700; color:var(--text-bright); line-height:1; }
+  .sfd-type-label { font-size:8px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-dim); margin-top:2px; }
+  #sfd-list { max-height:280px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:var(--border) transparent; }
+  .sfd-item { padding:6px 10px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; }
+  .sfd-item:last-child { border-bottom:none; }
+  .sfd-badge { font-size:8px; font-weight:700; padding:2px 5px; border:1px solid; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap; flex-shrink:0; }
+  .sfd-fire  { color:var(--red);   border-color:var(--red);   background:rgba(230,57,70,0.1); }
+  .sfd-aid   { color:var(--amber); border-color:var(--amber); background:rgba(240,165,0,0.1); }
+  .sfd-other { color:var(--text-dim); border-color:var(--border); }
+  .sfd-street { font-size:10px; color:var(--text); flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .sfd-time  { font-size:9px; color:var(--text-dim); white-space:nowrap; }
+  #sfd-note  { padding:4px 10px; font-size:8px; color:var(--text-dim); font-style:italic; border-top:1px solid var(--border); }
+
+  /* ── SEISMIC ── */
+  #seismic-quakes { max-height:260px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:var(--border) transparent; }
+  .seismic-section-label { padding:4px 10px; font-size:9px; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--blue); background:var(--bg3); border-bottom:1px solid var(--border); border-top:1px solid var(--border); }
+  .seismic-section-label:first-child { border-top:none; }
+  .volcano-grid { display:grid; grid-template-columns:repeat(3,1fr); border-top:1px solid var(--border); }
+  .volcano-cell { padding:12px 14px; border-right:1px solid var(--border); }
+  .volcano-cell:last-child { border-right:none; }
+  .volcano-name  { font-size:9px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-dim); margin-bottom:6px; }
+  .volcano-alert { font-size:16px; font-weight:700; line-height:1; }
+  .volcano-avcode{ font-size:10px; font-weight:700; letter-spacing:0.08em; margin-top:3px; }
+  .volcano-updated { font-size:8px; color:var(--text-dim); margin-top:4px; }
+
   /* ── ERROR / LOADING ── */
   .loading-msg, .error-msg { padding:20px; text-align:center; font-size:11px; }
   .loading-msg { color:var(--text-dim); }
@@ -280,6 +369,29 @@
   /* ── CONFIG NOTICE ── */
   #config-notice { background:rgba(240,165,0,0.08); border:1px solid rgba(240,165,0,0.3); padding:8px 12px; font-size:10px; color:var(--amber); display:flex; align-items:center; gap:8px; }
   #config-notice a { color:var(--amber); }
+
+  /* ── OPS BRIEF (Command Layer) ── */
+  #ops-brief-panel { position:relative; overflow:hidden; background:#020111; }
+  /* CRT scanlines */
+  #ops-brief-panel::after { content:''; position:absolute; inset:0; pointer-events:none; z-index:10;
+    background:repeating-linear-gradient(to bottom, transparent 0px, transparent 3px, rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 4px); }
+  #ops-brief-panel .panel-header { background:linear-gradient(90deg,#06011a 0%,#0b0428 50%,#06011a 100%); border-bottom:1px solid rgba(61,214,42,0.45); position:relative; z-index:11; }
+  #ops-brief-panel .panel-title  { color:var(--gv-green) !important; letter-spacing:0.22em; }
+  #ops-brief-panel .refresh-ts   { color:rgba(61,214,42,0.38); font-size:8px; letter-spacing:0.04em; }
+  #ops-brief-content  { padding:10px 14px 6px; position:relative; z-index:11; }
+  #ops-brief-bullets  { display:flex; flex-direction:column; gap:6px; }
+  .ops-bullet { display:flex; align-items:flex-start; gap:10px; font-size:11px; color:var(--gv-green); line-height:1.5; letter-spacing:0.015em; }
+  .ops-bullet span:last-child { flex:1; }
+  .ops-indicator { width:7px; height:7px; border-radius:50%; flex-shrink:0; margin-top:4px; }
+  .ops-indicator.green { background:var(--green); box-shadow:0 0 5px var(--green); }
+  .ops-indicator.amber { background:var(--amber); box-shadow:0 0 5px var(--amber); }
+  .ops-indicator.red   { background:var(--red);   box-shadow:0 0 5px var(--red);   }
+  .ops-cursor { display:inline-block; width:7px; height:11px; background:var(--gv-green); box-shadow:0 0 6px var(--gv-green); vertical-align:middle; margin-left:3px; animation:ops-blink 1.1s step-end infinite; }
+  @keyframes ops-blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+  .ops-awaiting { font-size:11px; color:var(--amber); display:flex; align-items:center; gap:8px; padding:4px 0; letter-spacing:0.04em; }
+  .ops-pulse    { animation:ops-pulse-anim 1.4s ease-in-out infinite; }
+  @keyframes ops-pulse-anim { 0%,100%{opacity:1} 50%{opacity:0.15} }
+  #ops-brief-footer { padding:5px 14px 9px; font-size:8px; color:rgba(61,214,42,0.28); letter-spacing:0.08em; text-transform:uppercase; position:relative; z-index:11; border-top:1px solid rgba(42,34,82,0.4); margin-top:4px; }
 </style>
 </head>
 <body>
@@ -295,9 +407,13 @@
   </div>
   <div class="header-right">
     <span><span class="dot dot-green" id="weather-dot"></span> &#9729; Weather</span>
+    <span><span class="dot dot-gray"  id="aqi-dot"></span> &#127788; Air</span>
+    <span><span class="dot dot-gray"  id="nws-dot"></span> &#128680; NWS</span>
     <span><span class="dot dot-gray"  id="traffic-dot"></span> &#9888; Alerts</span>
     <span><span class="dot dot-gray"  id="ferry-dot"></span> &#9972; Ferries</span>
     <span><span class="dot dot-gray"  id="transit-dot"></span> &#128650; Link Rail</span>
+    <span><span class="dot dot-gray"  id="sfd-dot"></span> &#128658; SFD</span>
+    <span><span class="dot dot-gray"  id="seismic-dot"></span> &#127755; Seismic</span>
     <span id="sys-time">--:--:--</span>
   </div>
 </div>
@@ -316,6 +432,20 @@
     &#9888; WSDOT key not set. Set <code>WSDOT_KEY</code> in the CONFIG block.
   </div>
 
+  <!-- ── SEATTLE OPS BRIEF (command synthesis layer) ── -->
+  <div class="panel" id="ops-brief-panel">
+    <div class="panel-header">
+      <span class="panel-title"><span class="panel-icon">&#11041;</span> SEATTLE OPS BRIEF &mdash; <span id="ops-brief-ts">--:--:--</span></span>
+      <span class="refresh-ts" id="ops-brief-refresh">Initializing&hellip;</span>
+    </div>
+    <div id="ops-brief-content">
+      <div id="ops-brief-bullets">
+        <div class="ops-awaiting"><span class="dot dot-amber ops-pulse"></span>&nbsp; Awaiting data streams&hellip;</div>
+      </div>
+    </div>
+    <div id="ops-brief-footer">Rule-based synthesis from live data &middot; Not AI-generated</div>
+  </div>
+
   <!-- ── CONDITIONS STRIP ── -->
   <div class="panel" id="conditions-strip">
     <div class="panel-header">
@@ -323,6 +453,24 @@
       <span class="refresh-ts" id="weather-ts">—</span>
     </div>
     <div id="conditions-content"><div class="loading-msg">Fetching weather…</div></div>
+  </div>
+
+  <!-- ── NWS ACTIVE ALERTS ── -->
+  <div class="panel" id="nws-panel">
+    <div class="panel-header">
+      <span class="panel-title"><span class="panel-icon">&#128680;</span> NWS Active Weather Alerts — Seattle Area</span>
+      <span class="refresh-ts" id="nws-ts">—</span>
+    </div>
+    <div id="nws-alerts-list"><div class="loading-msg">Checking NWS&hellip;</div></div>
+  </div>
+
+  <!-- ── SEISMIC & VOLCANIC ── -->
+  <div class="panel" id="seismic-panel">
+    <div class="panel-header">
+      <span class="panel-title"><span class="panel-icon">&#127755;</span> Seismic &amp; Volcanic Activity &mdash; PNW</span>
+      <span class="refresh-ts" id="seismic-ts">—</span>
+    </div>
+    <div id="seismic-content"><div class="loading-msg">Loading USGS data&hellip;</div></div>
   </div>
 
   <!-- ── DRIVE WINDOW ── -->
@@ -335,28 +483,32 @@
     <div id="drive-chart-wrap"><div id="drive-chart"></div></div>
   </div>
 
-  <!-- ── MID GRID ── -->
-  <div id="mid-grid">
-
-    <!-- Incidents -->
-    <div class="panel" id="incidents-panel">
-      <div class="panel-header">
-        <span class="panel-title"><span class="panel-icon">&#9888;</span> Active Incidents &amp; Alerts</span>
-        <span class="refresh-ts" id="incidents-ts">—</span>
-      </div>
-      <div id="incidents-list"><div class="loading-msg">Loading incidents…</div></div>
+  <!-- ── INCIDENTS ── -->
+  <div class="panel" id="incidents-panel">
+    <div class="panel-header">
+      <span class="panel-title"><span class="panel-icon">&#9888;</span> Active Incidents &amp; Alerts</span>
+      <span class="refresh-ts" id="incidents-ts">—</span>
     </div>
+    <div id="incidents-list"><div class="loading-msg">Loading incidents…</div></div>
+  </div>
 
-    <!-- Ferry -->
-    <div class="panel" id="ferry-panel">
-      <div class="panel-header">
-        <span class="panel-title"><span class="panel-icon">&#9972;</span> WSF Ferry Status</span>
-        <span class="refresh-ts" id="ferry-ts">—</span>
-      </div>
-      <div id="ferry-content"><div class="loading-msg">Loading ferry data…</div></div>
+  <!-- ── FERRY ── -->
+  <div class="panel" id="ferry-panel">
+    <div class="panel-header">
+      <span class="panel-title"><span class="panel-icon">&#9972;</span> WSF Ferry Status — Live Vessel Positions</span>
+      <span class="refresh-ts" id="ferry-ts">—</span>
     </div>
+    <div id="ferry-content"><div class="loading-msg">Loading ferry data…</div></div>
+  </div>
 
-  </div><!-- /mid-grid -->
+  <!-- ── SFD FIRE & DISPATCH ── -->
+  <div class="panel" id="sfd-panel">
+    <div class="panel-header">
+      <span class="panel-title"><span class="panel-icon">&#128658;</span> Seattle Fire &amp; Aid Dispatches — Last 2 Hours</span>
+      <span class="refresh-ts" id="sfd-ts">—</span>
+    </div>
+    <div id="sfd-content"><div class="loading-msg">Loading SFD dispatch data&hellip;</div></div>
+  </div>
 
   <!-- ── UPCOMING EVENTS ── -->
   <div class="panel" id="events-panel">
@@ -533,7 +685,28 @@
 
 </div><!-- /main -->
 
+<!-- ═══════════════════════════════════════════ FOOTER ═══ -->
+<footer id="dashboard-footer">
+  <div class="footer-sources">
+    <strong>Data Sources</strong> &nbsp;·&nbsp;
+    WSDOT Traveler Information API &nbsp;·&nbsp;
+    Washington State Ferries Vessel API &nbsp;·&nbsp;
+    Open-Meteo (Weather &amp; Air Quality) &nbsp;·&nbsp;
+    NWS / api.weather.gov (Watches &amp; Warnings) &nbsp;·&nbsp;
+    OneBusAway Puget Sound (Link Rail) &nbsp;·&nbsp;
+    NOAA CO-OPS Tides &amp; Currents &nbsp;·&nbsp;
+    Seattle Open Data / SFD (911 Dispatches) &nbsp;·&nbsp;
+    ESPN Public Schedule API (Events)
+  </div>
+  <div class="footer-disclaimer">
+    GOATvision does not generate conditions with AI.<br>
+    It aggregates live public infrastructure data into operational decision signals.
+  </div>
+  <div class="footer-brand"><span>GOAT</span>vision Seattle&#8482;</div>
+</footer>
+
 <!-- ═══════════════════════════════════════════ SCRIPT ═══ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 'use strict';
 
@@ -541,8 +714,10 @@
 //  CONFIG
 // ╚══════════════════════════════════════════════════════════╝
 const CONFIG = {
-  WSDOT_KEY: '9086eb9c-b743-432c-a9ca-86e160d0d780',
-  OBA_KEY:   'TEST',          // register at developer.onebusaway.org for higher limits
+  WSDOT_KEY:      '9086eb9c-b743-432c-a9ca-86e160d0d780',
+  OBA_KEY:        'TEST',          // register at developer.onebusaway.org for higher limits
+  SUPABASE_URL:   '',              // https://scsdstpabzkiqnvsskts.supabase.co/rest/v1/
+  SUPABASE_ANON_KEY: '',           // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNjc2RzdHBhYnpraXFudnNza3RzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MTUxNzcsImV4cCI6MjA5NTI5MTE3N30.HMo41UCsWsCwk75GxoujLcIlwlZDhXPNnLZ1x7K8VV8paste your Supabase anon/public key here
   LAT: 47.6062,
   LON: -122.3321,
   REFRESH_WEATHER_MS:   5 * 60 * 1000,
@@ -550,6 +725,42 @@ const CONFIG = {
   REFRESH_INCIDENTS_MS: 2 * 60 * 1000,
   REFRESH_FERRY_MS:     2 * 60 * 1000,
 };
+
+// ╔══════════════════════════════════════════════════════════╗
+//  SUPABASE CLIENT
+// ╚══════════════════════════════════════════════════════════╝
+const _supa = (CONFIG.SUPABASE_URL && CONFIG.SUPABASE_ANON_KEY)
+  ? supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY)
+  : null;
+
+async function snapshotCondition(category, locationKey, value, rawJson = {}) {
+  if (!_supa) return;
+  const { error } = await _supa.from('condition_snapshots').insert({
+    category,
+    location_key: locationKey,
+    value,
+    raw_json: rawJson,
+  });
+  if (error) console.warn('[Supabase] snapshotCondition error:', error.message);
+}
+
+async function getHistoricalBaseline(category, locationKey) {
+  if (!_supa) return null;
+  try {
+    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const { data, error } = await _supa
+      .from('condition_snapshots')
+      .select('value')
+      .eq('category', category)
+      .eq('location_key', locationKey)
+      .gte('captured_at', since);
+    if (error || !data?.length) return null;
+    const vals = data.map(r => Number(r.value)).filter(v => !isNaN(v));
+    if (!vals.length) return null;
+    const sum = vals.reduce((s, v) => s + v, 0);
+    return { avg: Math.round(sum / vals.length), min: Math.min(...vals), max: Math.max(...vals), count: vals.length };
+  } catch { return null; }
+}
 
 // ╔══════════════════════════════════════════════════════════╗
 //  CORS PROXY CHAIN (required for WSDOT APIs from file://)
@@ -676,6 +887,17 @@ function sevClass(s)  { return s>=0.6?'sev-red':s>=0.3?'sev-amber':'sev-green'; 
 //  WEATHER + CONDITIONS
 // ╚══════════════════════════════════════════════════════════╝
 let weatherData = null;
+let aqiData     = null;
+
+// ── OPS BRIEF — lifted cross-panel state ──────────────────
+let ferryVessels              = [];   // raw WSF vessel array
+let nwsAlerts                 = [];   // raw NWS features array
+let sfdDispatches             = [];   // raw SFD dispatch rows
+let eventsData                = [];   // processed ESPN event objects
+let driveWindowScores         = [];   // hourly {label,score} from drive window
+let transitHasLivePredictions = null; // true/false/null(unknown)
+// Readiness flags — distinguish "not yet fetched" from "fetched, zero results"
+const _brief = { weather:false, tt:false, ferry:false, transit:false, nws:false, sfd:false, events:false };
 
 async function fetchWeather() {
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.LAT}&longitude=${CONFIG.LON}` +
@@ -688,6 +910,8 @@ async function fetchWeather() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     weatherData = data;
+    _brief.weather = true;
+    snapshotCondition('weather', 'SEA-TAC', weatherData.current.temperature_2m, weatherData.current);
     renderConditions(data);
     renderDriveWindow(data);
     renderCoffee(data);
@@ -735,6 +959,20 @@ function renderConditions(data) {
     { label:'Sunrise',     value:sunriseStr,      sub:`Sets ${sunsetStr}`, sev:'sev-green', smallVal:true },
   ];
 
+  // Append AQI cells if data already loaded
+  if (aqiData) {
+    const aqi  = aqiData.us_aqi ?? null;
+    const pm25 = aqiData.pm2_5  ?? null;
+    const aqInfo = aqiLevel(aqi);
+    const smokeFlag = pm25 != null && pm25 > 35;
+    const month = new Date().getMonth();
+    const smokeSeason = month >= 6 && month <= 9;
+    cells.push({ label:'Air Quality', value:aqInfo.label, sub:aqInfo.sub, sev:aqInfo.cls, smallVal:true });
+    cells.push({ label:'Smoke / PM2.5', value:pm25 != null ? pm25.toFixed(1) : '—', unit:' µg/m³',
+      sub: smokeFlag ? (smokeSeason ? '🔥 Wildfire smoke likely' : 'Elevated PM2.5') : 'Air clear',
+      sev: smokeFlag ? 'sev-amber' : 'sev-green', smallVal:true });
+  }
+
   document.getElementById('conditions-content').innerHTML = cells.map(cc => `
     <div class="cond-cell ${(cc.sev||'').replace('sev-','sev-bg-')}">
       <div class="cond-label">${cc.label}</div>
@@ -755,6 +993,7 @@ function renderDriveWindow(data) {
     const score = Math.round((p/100)*40 + windSev(w)*30 + wmoSeverity(co)*30);
     hours.push({ label:d.toLocaleTimeString('en-US',{hour:'numeric',hour12:true}).replace(':00','').replace(' ',''), p,w,code:co,score });
   }
+  driveWindowScores = hours;  // lift for Ops Brief
   const max=Math.max(...hours.map(h=>h.score)), min=Math.min(...hours.map(h=>h.score));
   const bi=hours.findIndex(h=>h.score===min), wi=hours.findIndex(h=>h.score===max);
   let sum='';
@@ -772,6 +1011,167 @@ function renderDriveWindow(data) {
       <div class="drive-bar-label">${h.label}</div>
     </div>`;
   }).join('');
+}
+
+// ╔══════════════════════════════════════════════════════════╗
+//  AIR QUALITY (Open-Meteo Air Quality API — no key)
+// ╚══════════════════════════════════════════════════════════╝
+function aqiLevel(aqi) {
+  if (aqi == null) return { label:'—',            cls:'',          sub:'No data' };
+  if (aqi <=  50)  return { label:'Good',          cls:'sev-green', sub:`AQI ${aqi} — Clean air` };
+  if (aqi <= 100)  return { label:'Moderate',      cls:'sev-amber', sub:`AQI ${aqi} — Sensitive groups` };
+  if (aqi <= 150)  return { label:'Sensitive',     cls:'sev-amber', sub:`AQI ${aqi} — Limit strenuous outdoor activity` };
+  if (aqi <= 200)  return { label:'Unhealthy',     cls:'sev-red',   sub:`AQI ${aqi} — Reduce outdoor time` };
+  if (aqi <= 300)  return { label:'Very Unhealthy',cls:'sev-red',   sub:`AQI ${aqi} — Avoid outdoors` };
+  return             { label:'Hazardous',          cls:'sev-red',   sub:`AQI ${aqi} — Stay inside` };
+}
+
+async function fetchAirQuality() {
+  const url = `https://air-quality-api.open-meteo.com/v1/air-quality` +
+    `?latitude=${CONFIG.LAT}&longitude=${CONFIG.LON}&current=us_aqi,pm2_5,pm10&domains=cams_global`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    aqiData = data.current;
+    snapshotCondition('aqi', 'SEA-TAC', aqiData.us_aqi ?? 0, aqiData);
+    const aqi = aqiData?.us_aqi ?? null;
+    setDot('aqi-dot', aqi == null ? 'gray' : aqi <= 50 ? 'green' : aqi <= 100 ? 'amber' : 'red');
+    // Re-render conditions strip with AQI cells appended
+    if (weatherData) renderConditions(weatherData);
+  } catch(e) {
+    setDot('aqi-dot', 'red');
+  }
+}
+
+// ╔══════════════════════════════════════════════════════════╗
+//  NWS ACTIVE WEATHER ALERTS (api.weather.gov — no key)
+// ╚══════════════════════════════════════════════════════════╝
+async function fetchNWSAlerts() {
+  const url = `https://api.weather.gov/alerts/active?point=${CONFIG.LAT},${CONFIG.LON}&status=actual`;
+  try {
+    const res = await fetch(url, { headers:{ Accept:'application/geo+json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const alerts = data.features || [];
+    nwsAlerts = alerts;
+    _brief.nws = true;
+    renderNWSAlerts(alerts);
+    setDot('nws-dot', alerts.length === 0 ? 'green' : alerts.some(a => ['Extreme','Severe'].includes(a.properties?.severity)) ? 'red' : 'amber');
+    document.getElementById('nws-ts').textContent = `Refreshed ${ts()}`;
+  } catch(e) {
+    setDot('nws-dot','red');
+    document.getElementById('nws-alerts-list').innerHTML = `<div class="error-msg">&#9888; NWS failed: ${e.message}</div>`;
+  }
+}
+
+function renderNWSAlerts(alerts) {
+  if (!alerts.length) {
+    document.getElementById('nws-alerts-list').innerHTML =
+      `<div class="nws-no-alerts"><span class="sev-green">&#10003;</span>&nbsp; No active watches, warnings, or advisories for the Seattle area.</div>`;
+    return;
+  }
+  const sevOrder = { Extreme:0, Severe:1, Moderate:2, Minor:3, Unknown:4 };
+  alerts.sort((a,b) => (sevOrder[a.properties?.severity]??4) - (sevOrder[b.properties?.severity]??4));
+  document.getElementById('nws-alerts-list').innerHTML = alerts.map(f => {
+    const p   = f.properties || {};
+    const sev = p.severity || 'Unknown';
+    const cls = sev==='Extreme'?'nws-extreme':sev==='Severe'?'nws-severe':sev==='Moderate'?'nws-moderate':'nws-minor';
+    const exp = p.expires ? new Date(p.expires).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true}) : '—';
+    const onset = p.onset  ? new Date(p.onset).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true}) : null;
+    const headline = (p.headline || p.description?.split('\n')[0] || '').slice(0, 180);
+    return `<div class="nws-alert-item">
+      <div>
+        <div class="nws-sev-badge ${cls}">${sev}</div>
+        <div style="font-size:9px;color:var(--text-dim);margin-top:4px;text-transform:uppercase;letter-spacing:0.06em">${p.certainty||''}</div>
+      </div>
+      <div>
+        <div class="nws-event">${p.event || 'Alert'}</div>
+        <div class="nws-headline">${headline}</div>
+        <div class="nws-meta">${onset?`Onset ${onset} &nbsp;&middot;&nbsp; `:'' }Expires ${exp}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ╔══════════════════════════════════════════════════════════╗
+//  SEATTLE FIRE 911 DISPATCHES (Seattle Open Data — no key)
+// ╚══════════════════════════════════════════════════════════╝
+function sfdCategory(type) {
+  const t = (type||'').toLowerCase();
+  if (t.includes('fire')||t.includes('explosion')||t.includes('hazmat')||t.includes('gas'))
+    return { cat:'Fire / Hazmat', cls:'sfd-fire' };
+  if (t.includes('aid')||t.includes('medic')||t.includes('cardiac')||t.includes('rescue')||t.includes('trauma'))
+    return { cat:'Medical / Aid', cls:'sfd-aid' };
+  if (t.includes('motor vehicle')||t.includes('mvc')||t.includes('auto accident'))
+    return { cat:'MVA', cls:'sfd-aid' };
+  if (t.includes('alarm'))
+    return { cat:'Alarm', cls:'sfd-other' };
+  return { cat:'Other', cls:'sfd-other' };
+}
+
+function localDatetimeStr(date) {
+  const p = n => String(n).padStart(2,'0');
+  return `${date.getFullYear()}-${p(date.getMonth()+1)}-${p(date.getDate())}` +
+         `T${p(date.getHours())}:${p(date.getMinutes())}:${p(date.getSeconds())}`;
+}
+
+async function fetchSFD() {
+  // SFD datetimes are stored in Seattle local time — must compare in local time, not UTC
+  const twoHoursAgo = localDatetimeStr(new Date(Date.now() - 2*3600000));
+  const url = `https://data.seattle.gov/resource/kzjm-xkqj.json` +
+    `?$where=datetime>'${twoHoursAgo}'&$limit=50&$order=datetime+DESC`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    sfdDispatches = data;
+    _brief.sfd = true;
+    renderSFD(data);
+    setDot('sfd-dot','green');
+    document.getElementById('sfd-ts').textContent = `Refreshed ${ts()} · ${data.length} dispatch${data.length!==1?'es':''} (2 hr)`;
+  } catch(e) {
+    setDot('sfd-dot','red');
+    document.getElementById('sfd-content').innerHTML = `<div class="error-msg">&#9888; SFD feed failed: ${e.message}</div>`;
+  }
+}
+
+function renderSFD(dispatches) {
+  if (!dispatches.length) {
+    document.getElementById('sfd-content').innerHTML = '<div class="loading-msg">No dispatches recorded in the last 2 hours.</div>';
+    return;
+  }
+
+  // Aggregate counts by category
+  const counts = {};
+  for (const d of dispatches) {
+    const cat = sfdCategory(d.type).cat;
+    counts[cat] = (counts[cat]||0) + 1;
+  }
+  const summaryHtml = Object.entries(counts)
+    .sort((a,b) => b[1]-a[1])
+    .map(([cat,cnt]) => `<div class="sfd-type-cell">
+      <div class="sfd-type-count">${cnt}</div>
+      <div class="sfd-type-label">${cat}</div>
+    </div>`).join('');
+
+  // Individual dispatches — street name only, no block numbers
+  const listHtml = dispatches.slice(0,25).map(d => {
+    const {cls} = sfdCategory(d.type);
+    const when  = d.datetime ? new Date(d.datetime).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true}) : '—';
+    // Strip leading block number, show street name only
+    const street = (d.address||'Seattle').replace(/^\d+\s+(block\s+of\s+)?/i,'').trim();
+    return `<div class="sfd-item">
+      <div class="sfd-badge ${cls}">${d.type||'—'}</div>
+      <div class="sfd-street">${street}</div>
+      <div class="sfd-time">${when}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('sfd-content').innerHTML =
+    `<div id="sfd-summary">${summaryHtml}</div>` +
+    `<div id="sfd-list">${listHtml}</div>` +
+    `<div id="sfd-note">Activity aggregated from Seattle Open Data · Block-level streets only · Updated every 5 min by SFD</div>`;
 }
 
 // ╔══════════════════════════════════════════════════════════╗
@@ -832,6 +1232,8 @@ async function fetchFerry() {
       `https://www.wsdot.wa.gov/ferries/api/vessels/rest/vessellocations?apiaccesscode=${CONFIG.WSDOT_KEY}`
     );
     if (!Array.isArray(data)) throw new Error('Non-array response');
+    ferryVessels = data;
+    _brief.ferry = true;
     renderFerry(data);
     setDot('ferry-dot','green');
     document.getElementById('ferry-ts').textContent = `Refreshed ${ts()}`;
@@ -851,49 +1253,101 @@ function matchRoute(vessel) {
   return null;
 }
 
+// Haversine distance in km between two lat/lon points
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371, r = x => x * Math.PI / 180;
+  const dLat = r(lat2-lat1), dLon = r(lon2-lon1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(r(lat1))*Math.cos(r(lat2))*Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+// Returns 0.0–1.0 progress across the route (GPS-based, time fallback)
+function vesselProgress(v) {
+  if (v.AtDock) return 0.03; // parked at departure terminal
+  const vLat=+v.Latitude,   vLon=+v.Longitude;
+  const dLat=+v.DepartingTerminalLatitude, dLon=+v.DepartingTerminalLongitude;
+  const aLat=+v.ArrivingTerminalLatitude,  aLon=+v.ArrivingTerminalLongitude;
+  if (vLat && dLat && aLat) {
+    const total = haversine(dLat, dLon, aLat, aLon);
+    if (total > 0) return Math.min(0.95, Math.max(0.05, haversine(dLat,dLon,vLat,vLon) / total));
+  }
+  // Time-based fallback when coordinates unavailable
+  const left = parseDotNetDate(v.LeftDock);
+  const eta  = parseDotNetDate(v.ETA || v.ScheduledArrival);
+  if (left && eta && eta > left)
+    return Math.min(0.95, Math.max(0.05, (Date.now()-left) / (eta-left)));
+  return 0.5;
+}
+
+// Shorten a terminal name to the key landmark word
+function shortTerm(name) {
+  const clean = (name||'').replace(/\bIsland\b/i,'').replace(/\bTerminal\b/i,'').trim();
+  // Keep up to 2 words
+  return clean.split(/\s+/).slice(0,2).join(' ').toUpperCase() || name.toUpperCase();
+}
+
 function renderFerry(vessels) {
   const byRoute = {};
   FERRY_ROUTE_KEYWORDS.forEach(r => { byRoute[r.name] = []; });
-
   for (const v of vessels) {
     const rname = matchRoute(v);
     if (rname && byRoute[rname]) byRoute[rname].push(v);
   }
 
-  let html = '';
+  let html = '<div id="ferry-routes">';
   for (const route of FERRY_ROUTE_KEYWORDS) {
     const vs = byRoute[route.name];
-    let rows = '';
-    if (vs.length === 0) {
-      rows = `<div class="ferry-dep"><div><div class="ferry-time">—</div><div class="ferry-vessel">No vessel data</div></div><span class="ferry-status on-time">See wsdot.com</span></div>`;
+    let inner = '';
+
+    if (!vs.length) {
+      inner = `<div class="ferry-no-data">No vessel data — see wsdot.com/ferries</div>`;
     } else {
-      rows = vs.map(v => {
-        const atDock   = v.AtDock || false;
-        const speed    = v.Speed  != null ? parseFloat(v.Speed).toFixed(1) : null;
-        const name     = v.VesselName || 'Vessel';
-        const dep      = v.DepartingTerminalName || '';
-        const arr      = v.ArrivingTerminalName  || '';
+      inner = vs.map(v => {
+        const atDock = !!v.AtDock;
+        const name   = v.VesselName || 'Vessel';
+        const dep    = v.DepartingTerminalName || '';
+        const arr    = v.ArrivingTerminalName  || '';
+        const speed  = v.Speed != null ? parseFloat(v.Speed).toFixed(1) : null;
 
-        let timeStr='—', label='';
+        const arrTime = parseDotNetDate(v.ETA || v.ScheduledArrival);
         const depTime = parseDotNetDate(v.ScheduledDeparture || v.DepartingTime);
-        const arrTime = parseDotNetDate(v.ScheduledArrival  || v.ETA);
-        if (atDock && depTime)  { timeStr=depTime.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true}); label='Departs'; }
-        else if (!atDock && arrTime) { timeStr=arrTime.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true}); label='ETA'; }
-        else if (depTime) { timeStr=depTime.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true}); label=''; }
+        let timeLine = '';
+        if (atDock && depTime)
+          timeLine = ` · Departs ${depTime.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true})}`;
+        else if (!atDock && arrTime)
+          timeLine = ` · ETA ${arrTime.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true})}`;
 
-        const statusText  = atDock ? 'At Dock' : speed!=null ? `Underway ${speed}kn` : 'Underway';
-        const statusClass = atDock ? 'on-time' : 'delayed';
-        return `<div class="ferry-dep">
-          <div>
-            <div class="ferry-time">${label?`<span style="font-size:8px;color:var(--text-dim)">${label} </span>`:''}${timeStr}</div>
-            <div class="ferry-vessel">${name} · ${dep} → ${arr}</div>
+        const pct  = vesselProgress(v) * 100;
+        const fill = `calc(${pct.toFixed(1)}% - 5px)`;
+        const statusSpan = atDock
+          ? `<span class="vdock">At Dock</span>`
+          : `<span class="vonway">Underway${speed ? ` ${speed}kn` : ''}</span>`;
+
+        return `<div class="ferry-vessel-block">
+          <div class="ferry-track-wrap">
+            <div class="ferry-term">${shortTerm(dep)}</div>
+            <div class="ferry-track">
+              <div class="ferry-track-bg"></div>
+              <div class="ferry-track-fill" style="width:${fill}"></div>
+              <div class="ferry-dot start"></div>
+              <div class="ferry-dot end"></div>
+              <div class="ferry-boat" style="left:${pct.toFixed(1)}%">⛴</div>
+            </div>
+            <div class="ferry-term right">${shortTerm(arr)}</div>
           </div>
-          <span class="ferry-status ${statusClass}">${statusText}</span>
+          <div class="ferry-meta">
+            <span class="vname">${name}</span> · ${statusSpan}${timeLine}
+          </div>
         </div>`;
       }).join('');
     }
-    html += `<div class="ferry-route"><div class="ferry-route-name">${route.name}</div><div class="ferry-departures">${rows}</div></div>`;
+
+    html += `<div class="ferry-route">
+      <div class="ferry-route-name">${route.name}</div>
+      ${inner}
+    </div>`;
   }
+  html += '</div>';
   document.getElementById('ferry-content').innerHTML = html;
 }
 
@@ -951,6 +1405,8 @@ async function fetchEvents() {
   }));
 
   all.sort((a, b) => a.date - b.date);
+  eventsData = all;
+  _brief.events = true;
   renderEvents(all);
   document.getElementById('events-ts').textContent =
     `Refreshed ${ts()} · ${all.length} home event${all.length !== 1 ? 's' : ''} found`;
@@ -1266,6 +1722,14 @@ async function fetchTransit() {
     for (const r of settled)
       if (r.status==='fulfilled') arrivalMap.set(r.value.sid, r.value.arrivals);
 
+    // Determine whether live predictions exist (vs. schedule-only) for Ops Brief
+    let hasLiveData = false;
+    for (const arrs of arrivalMap.values()) {
+      if (arrs.some(a => !a.sched)) { hasLiveData = true; break; }
+    }
+    transitHasLivePredictions = hasLiveData;
+    _brief.transit = true;
+
     renderTransit(routeStops, arrivalMap);
     setDot('transit-dot','green');
     document.getElementById('transit-ts').textContent = `Refreshed ${ts()}`;
@@ -1356,7 +1820,12 @@ async function fetchTravelTimes() {
       return true;
     }).sort((a,b) => a._road.localeCompare(b._road)||a._dir.localeCompare(b._dir)||((a.StartPoint?.MilePost??0)-(b.StartPoint?.MilePost??0)));
 
+    for (const route of allTravelTimes) {
+      snapshotCondition('traffic', String(route.TravelTimeID), route.CurrentTime,
+        { current: route.CurrentTime, average: route.AverageTime, name: route.Name });
+    }
     ttFetchedAt = new Date();
+    _brief.tt = true;
     renderTravelTimes();
     updateTrafficMap();
     document.getElementById('tt-ts').textContent = `Refreshed ${ts(ttFetchedAt)} · ${allTravelTimes.length} routes`;
@@ -1366,12 +1835,17 @@ async function fetchTravelTimes() {
   }
 }
 
-function renderTravelTimes() {
+async function renderTravelTimes() {
   const filtered = ttRoadFilter==='ALL' ? allTravelTimes : allTravelTimes.filter(r=>r._road===ttRoadFilter);
   if (!filtered.length) { document.getElementById('tt-list').innerHTML=`<div class="loading-msg">No routes for ${ttRoadFilter}</div>`; return; }
 
+  const baselines = await Promise.all(
+    filtered.map(r => getHistoricalBaseline('traffic', String(r.TravelTimeID)))
+  );
+
   let html='', lastRoad=null;
-  for (const r of filtered) {
+  for (let i=0; i<filtered.length; i++) {
+    const r=filtered[i], baseline=baselines[i];
     if (ttRoadFilter==='ALL' && r._road!==lastRoad) {
       html+=`<div class="tt-group-header">${r._road}</div>`; lastRoad=r._road;
     }
@@ -1383,11 +1857,12 @@ function renderTravelTimes() {
     if (delta===0&&ratio<=1.1) bt='ON TIME';
     const ud = parseDotNetDate(r.TimeUpdated);
     const name = r.Name.replace(/\s*(HOV|EL)\s*$/i,'').trim();
+    const avgDisplay = baseline ? `7d avg: ${baseline.avg}m` : `avg ${avg}m`;
     html+=`<div class="tt-row" title="${r.Description||r.Name}${ud?' · Updated '+minsAgo(ud):''}">
       <span class="tt-tag">${r._road} ${r._dir}</span>
       <span class="tt-name">${name}</span>
       <span class="tt-cur">${cur}<span class="tt-cur-unit">m</span></span>
-      <span class="tt-avg">avg ${avg}m</span>
+      <span class="tt-avg">${avgDisplay}</span>
       <span class="tt-badge ${bc}">${bt}</span>
     </div>`;
   }
@@ -1526,6 +2001,306 @@ function updateTrafficMap() {
 }
 
 // ╔══════════════════════════════════════════════════════════╗
+//  SEATTLE OPS BRIEF (rule-based synthesis — no AI)
+// ╚══════════════════════════════════════════════════════════╝
+function generateOpsBrief() {
+  const el   = document.getElementById('ops-brief-bullets');
+  const tsEl = document.getElementById('ops-brief-ts');
+  const rfEl = document.getElementById('ops-brief-refresh');
+  if (!el) return;
+
+  const now = ts();
+  if (tsEl) tsEl.textContent = now;
+  if (rfEl) rfEl.textContent = `Updated ${now}`;
+
+  // How many data sources are ready?
+  const readyCount = Object.values(_brief).filter(Boolean).length;
+  if (readyCount < 3) {
+    el.innerHTML = `<div class="ops-awaiting"><span class="dot dot-amber ops-pulse"></span>&nbsp; Awaiting data streams&hellip;</div>`;
+    return;
+  }
+
+  const bullets = [];
+
+  // ── 1. TRAFFIC ──────────────────────────────────────────
+  if (_brief.tt && allTravelTimes.length > 0) {
+    const worst = allTravelTimes.reduce((best, r) => {
+      const db = (r.CurrentTime ?? 0) - (r.AverageTime ?? 0);
+      const da = (best.CurrentTime ?? 0) - (best.AverageTime ?? 0);
+      return db > da ? r : best;
+    });
+    const delay = (worst.CurrentTime ?? 0) - (worst.AverageTime ?? 0);
+    if (delay > 15) {
+      bullets.push({ color:'red',   text:`Heavy delay on ${worst._road} — +${delay} min above average.` });
+    } else if (delay > 5) {
+      const dirs = { '↑':'northbound','↓':'southbound','→':'eastbound','←':'westbound' };
+      const dw   = dirs[worst._dir] ? dirs[worst._dir] + ' ' : '';
+      bullets.push({ color:'amber', text:`Moderate ${dw}congestion on ${worst._road}.` });
+    } else {
+      bullets.push({ color:'green', text:'Highway corridors clear.' });
+    }
+  }
+
+  // ── 2. WEATHER — CURRENT ────────────────────────────────
+  if (_brief.weather && weatherData) {
+    const c      = weatherData.current;
+    const precip = c.precipitation_probability ?? 0;
+    const wind   = Math.round(c.wind_speed_10m ?? 0);
+    const code   = c.weather_code;
+    if (precip > 60) {
+      bullets.push({ color:'amber', text:`Rain likely — ${precip}% precipitation probability.` });
+    } else if (wind > 20) {
+      bullets.push({ color:'amber', text:`Elevated wind advisory — ${wind} mph.` });
+    } else if (precip <= 20 && wind <= 10 && wmoSeverity(code) === 0) {
+      bullets.push({ color:'green', text:'Conditions clear.' });
+    }
+  }
+
+  // ── 3. DRIVE WINDOW ─────────────────────────────────────
+  if (driveWindowScores.length > 0) {
+    const curScore = driveWindowScores[0]?.score ?? 0;
+    if (curScore < 40) {
+      // Conditions currently good — find first degradation point
+      const firstBadIdx = driveWindowScores.findIndex(h => h.score >= 40);
+      if (firstBadIdx > 0) {
+        const lastGood = driveWindowScores[firstBadIdx - 1];
+        bullets.push({ color:'amber', text:`Drive quality drops after ${lastGood.label} — plan accordingly.` });
+      }
+      // All 12h good → omit bullet per spec
+    } else {
+      // Currently adverse — find when it improves
+      const firstGoodIdx = driveWindowScores.findIndex(h => h.score < 40);
+      if (firstGoodIdx > 0) {
+        bullets.push({ color:'amber', text:`Drive conditions adverse — improving near ${driveWindowScores[firstGoodIdx].label}.` });
+      } else if (firstGoodIdx === -1) {
+        bullets.push({ color:'red',   text:'Drive conditions adverse through the forecast window.' });
+      }
+    }
+  }
+
+  // ── 4. FERRY ────────────────────────────────────────────
+  if (_brief.ferry) {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour <= 23) {
+      const missing = FERRY_ROUTE_KEYWORDS
+        .filter(route => !ferryVessels.some(v => matchRoute(v) === route.name))
+        .map(route => route.name.split('/')[0].trim());
+      if (missing.length > 0) {
+        bullets.push({ color:'amber', text:`Ferry system: no vessel data for ${missing.join(', ')}.` });
+      } else {
+        bullets.push({ color:'green', text:'Ferry system stable.' });
+      }
+    }
+  }
+
+  // ── 5. LINK RAIL ────────────────────────────────────────
+  if (_brief.transit) {
+    if (!transitHasLivePredictions) {
+      bullets.push({ color:'amber', text:'Link rail — live tracking unavailable, schedule only.' });
+    } else {
+      bullets.push({ color:'green', text:'Link operations nominal.' });
+    }
+  }
+
+  // ── 6. EVENTS ───────────────────────────────────────────
+  if (_brief.events) {
+    const today   = new Date().toDateString();
+    const todayEv = eventsData.filter(ev => ev.date.toDateString() === today);
+    if (todayEv.length >= 2) {
+      const names   = todayEv.map(ev => ev.team.name).join(' + ');
+      const venuePt = todayEv[0].venue.split(' ').slice(0, 2).join(' ');
+      bullets.push({ color:'amber', text:`Elevated ${venuePt} traffic tonight — ${names}.` });
+    } else if (todayEv.length === 1) {
+      const ev     = todayEv[0];
+      const time   = ev.date.toLocaleTimeString('en-US',{ hour:'numeric', minute:'2-digit', hour12:true });
+      const venue  = ev.venue.split(' ').slice(0, 2).join(' ');
+      bullets.push({ color:'amber', text:`${ev.team.name} home game — expect ${venue} congestion near ${time}.` });
+    }
+    // No events today → omit
+  }
+
+  // ── 7. RAINIER VISIBILITY ───────────────────────────────
+  if (_brief.weather && weatherData) {
+    const c      = weatherData.current;
+    const clouds = c.cloud_cover ?? 0;
+    const code   = c.weather_code;
+    let rStat, rColor;
+    if (wmoSeverity(code) >= 0.5 || clouds > 75) { rStat = 'OBSCURED';       rColor = 'red';   }
+    else if (clouds > 40)                          { rStat = 'LOW VISIBILITY'; rColor = 'amber'; }
+    else                                           { rStat = 'CLEAR';          rColor = 'green'; }
+    bullets.push({ color:rColor, text:`Rainier visibility: ${rStat}.` });
+  }
+
+  // ── 8. NWS ALERTS ───────────────────────────────────────
+  if (_brief.nws && nwsAlerts.length > 0) {
+    const sevOrder = { Extreme:0, Severe:1, Moderate:2, Minor:3, Unknown:4 };
+    const top      = [...nwsAlerts].sort((a,b) =>
+      (sevOrder[a.properties?.severity] ?? 4) - (sevOrder[b.properties?.severity] ?? 4)
+    )[0];
+    const p      = top.properties || {};
+    const detail = (p.headline || '').split('.')[0].slice(0, 72).trim();
+    const txt    = detail ? `${p.event || 'NWS Alert'} in effect — ${detail}.`
+                          : `${p.event || 'NWS Alert'} in effect.`;
+    bullets.push({ color:'red', text:txt });
+  }
+
+  // ── 9. SFD DISPATCH ─────────────────────────────────────
+  if (_brief.sfd && sfdDispatches.length > 0) {
+    const fireHaz = sfdDispatches.filter(d => {
+      const t = (d.type || '').toLowerCase();
+      return t.includes('fire') || t.includes('explosion') || t.includes('hazmat') || t.includes('gas');
+    });
+    if (fireHaz.length > 3) {
+      bullets.push({ color:'red', text:`Elevated fire/hazmat activity — ${fireHaz.length} incidents last 2 hours.` });
+    }
+  }
+
+  // ── RENDER ──────────────────────────────────────────────
+  if (!bullets.length) {
+    el.innerHTML = `<div class="ops-bullet"><span class="ops-indicator green"></span><span>All systems nominal.<span class="ops-cursor"></span></span></div>`;
+    return;
+  }
+  const top8 = bullets.slice(0, 8);
+  el.innerHTML = top8.map((b, i) => {
+    const cursor = i === top8.length - 1 ? '<span class="ops-cursor"></span>' : '';
+    return `<div class="ops-bullet"><span class="ops-indicator ${b.color}"></span><span>${b.text}${cursor}</span></div>`;
+  }).join('');
+}
+
+// ╔══════════════════════════════════════════════════════════╗
+//  SEISMIC & VOLCANIC (USGS — no key required)
+// ╚══════════════════════════════════════════════════════════╝
+let _seismicQuakes   = null;
+let _volcanoStatuses = null;
+
+function seismicAgo(ms) {
+  const s = Math.floor((Date.now() - ms) / 1000);
+  if (s < 3600) return `${Math.floor(s / 60)} min ago`;
+  if (s < 86400) return `${(s / 3600).toFixed(1)} hrs ago`;
+  return `${Math.floor(s / 86400)}d ago`;
+}
+
+function magSevClass(mag) {
+  if (mag >= 4.0) return 'sev-red';
+  if (mag >= 2.5) return 'sev-amber';
+  return 'sev-green';
+}
+
+function volcanoSevClass(level) {
+  const l = (level || '').toLowerCase();
+  if (l === 'normal')   return 'sev-green';
+  if (l === 'advisory') return 'sev-amber';
+  return 'sev-red';
+}
+
+function renderSeismic() {
+  const el = document.getElementById('seismic-content');
+  if (!_seismicQuakes && !_volcanoStatuses) return;
+
+  let html = '';
+
+  // ── Recent Earthquakes ───────────────────────────────────
+  html += `<div class="seismic-section-label">Recent Earthquakes — 300 km radius</div>`;
+  if (_seismicQuakes && _seismicQuakes.length) {
+    html += `<div id="seismic-quakes">`;
+    for (const f of _seismicQuakes) {
+      const p    = f.properties;
+      const mag  = p.mag != null ? p.mag.toFixed(1) : '?';
+      const cls  = magSevClass(p.mag ?? 0);
+      const place= p.place || 'Unknown location';
+      const depth= f.geometry?.coordinates?.[2] != null ? `${f.geometry.coordinates[2].toFixed(1)} km depth` : '';
+      const ago  = p.time ? seismicAgo(p.time) : '—';
+      html += `<div class="incident-item">
+        <div>
+          <div class="incident-sev ${cls}" style="font-size:13px;font-weight:700;padding:3px 6px">M${mag}</div>
+          ${depth ? `<div style="font-size:8px;color:var(--text-dim);margin-top:3px;text-align:center">${depth}</div>` : ''}
+        </div>
+        <div>
+          <div class="incident-desc">${place}</div>
+          <div class="incident-meta">${ago}</div>
+        </div>
+      </div>`;
+    }
+    html += `</div>`;
+  } else if (_seismicQuakes) {
+    html += `<div class="loading-msg" style="padding:12px">No M1.5+ earthquakes in the last period.</div>`;
+  } else {
+    html += `<div class="loading-msg" style="padding:12px">Loading earthquakes&hellip;</div>`;
+  }
+
+  // ── Cascade Volcanoes ────────────────────────────────────
+  html += `<div class="seismic-section-label">Cascade Volcanoes — Alert Status</div>`;
+  if (_volcanoStatuses) {
+    html += `<div class="volcano-grid">`;
+    for (const v of _volcanoStatuses) {
+      const alertCls  = volcanoSevClass(v.alert_level);
+      const colorCls  = volcanoSevClass(v.aviation_color);
+      const updated   = v.pub_date ? new Date(v.pub_date).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '—';
+      html += `<div class="volcano-cell">
+        <div class="volcano-name">${v.name}</div>
+        <div class="volcano-alert ${alertCls}">${v.alert_level || '—'}</div>
+        <div class="volcano-avcode ${colorCls}">&#9992; ${v.aviation_color || '—'}</div>
+        <div class="volcano-updated">Updated ${updated}</div>
+      </div>`;
+    }
+    html += `</div>`;
+  } else {
+    html += `<div class="loading-msg" style="padding:12px">Loading volcano data&hellip;</div>`;
+  }
+
+  el.innerHTML = html;
+}
+
+async function fetchSeismic() {
+  const url = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson` +
+    `&latitude=${CONFIG.LAT}&longitude=${CONFIG.LON}&maxradiuskm=300` +
+    `&minmagnitude=1.5&orderby=time&limit=8`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    _seismicQuakes = data.features || [];
+    // Dot: red if any M4+, amber if any M2.5+, else green
+    const maxMag = _seismicQuakes.reduce((m, f) => Math.max(m, f.properties.mag ?? 0), 0);
+    setDot('seismic-dot', maxMag >= 4.0 ? 'red' : maxMag >= 2.5 ? 'amber' : 'green');
+    renderSeismic();
+    document.getElementById('seismic-ts').textContent = `Quakes refreshed ${ts()}`;
+  } catch(e) {
+    setDot('seismic-dot', 'red');
+    _seismicQuakes = [];
+    renderSeismic();
+    document.getElementById('seismic-ts').textContent = `Quake fetch failed: ${e.message}`;
+  }
+}
+
+async function fetchVolcano() {
+  const TARGETS = ['Mount Rainier', 'Mount Baker', 'Mount St. Helens'];
+  const url = `https://volcanoes.usgs.gov/vhp/updates/volcano_updates.json`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const list = Array.isArray(data) ? data : (data.updates || data.volcanoes || Object.values(data));
+    _volcanoStatuses = TARGETS.map(target => {
+      const match = list.find(v => (v.name || v.volcano_name || '').toLowerCase().includes(target.toLowerCase()));
+      return match
+        ? { name: target, alert_level: match.alert_level || match.alert || '—', aviation_color: match.aviation_color || match.color || '—', pub_date: match.pub_date || match.updated || null }
+        : { name: target, alert_level: 'Normal', aviation_color: 'GREEN', pub_date: null };
+    });
+    renderSeismic();
+    document.getElementById('seismic-ts').textContent = `Refreshed ${ts()}`;
+  } catch(e) {
+    _volcanoStatuses = [
+      { name:'Mount Rainier',    alert_level:'—', aviation_color:'—', pub_date:null },
+      { name:'Mount Baker',      alert_level:'—', aviation_color:'—', pub_date:null },
+      { name:'Mount St. Helens', alert_level:'—', aviation_color:'—', pub_date:null },
+    ];
+    renderSeismic();
+    document.getElementById('seismic-ts').textContent = `Volcano fetch failed: ${e.message}`;
+  }
+}
+
+// ╔══════════════════════════════════════════════════════════╗
 //  CONFIG NOTICE
 // ╚══════════════════════════════════════════════════════════╝
 function checkConfig() {
@@ -1541,6 +2316,8 @@ function init() {
   checkConfig();
 
   fetchWeather();
+  fetchAirQuality();
+  fetchNWSAlerts();
   fetchIncidents();
   fetchFerry();
   fetchTide();
@@ -1548,16 +2325,28 @@ function init() {
   fetchTravelTimes();
   fetchScenicCams();
   fetchEvents();
+  fetchSFD();
+  fetchSeismic();
+  fetchVolcano();
 
   setInterval(fetchWeather,     CONFIG.REFRESH_WEATHER_MS);
+  setInterval(fetchAirQuality,  CONFIG.REFRESH_WEATHER_MS);   // same cadence as weather
+  setInterval(fetchNWSAlerts,   5 * 60 * 1000);               // NWS updates every 5 min
   setInterval(fetchTravelTimes, CONFIG.REFRESH_TT_MS);
   setInterval(fetchIncidents,   CONFIG.REFRESH_INCIDENTS_MS);
   setInterval(fetchFerry,       CONFIG.REFRESH_FERRY_MS);
-  setInterval(fetchEvents,      60 * 60 * 1000); // schedule rarely changes
+  setInterval(fetchSFD,         5 * 60 * 1000);               // SFD feed updates every 5 min
+  setInterval(fetchEvents,      60 * 60 * 1000);               // schedule rarely changes
   setInterval(fetchTide,      10 * 60 * 1000);
   setInterval(fetchTransit,   90 * 1000);
   setInterval(refreshAllCams,  60 * 1000);       // refresh all cam images every 60s
   setInterval(fetchScenicCams, 10 * 60 * 1000); // re-fetch full cam list every 10 min
+  setInterval(fetchSeismic,    5  * 60 * 1000); // USGS earthquake feed
+  setInterval(fetchVolcano,    30 * 60 * 1000); // volcano alert levels rarely change
+
+  // Ops Brief — first render after 2s (allow panels to populate), then every 2 min
+  setTimeout(generateOpsBrief, 2000);
+  setInterval(generateOpsBrief, 2 * 60 * 1000);
 
   // Keep "X ago" timestamps current
   setInterval(() => {
