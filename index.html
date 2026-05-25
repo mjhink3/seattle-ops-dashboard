@@ -1546,6 +1546,21 @@ async function fetchEvents() {
     `Refreshed ${ts()} · ${all.length} home event${all.length !== 1 ? 's' : ''} found`;
 }
 
+function getSportEmoji(team, title = '') {
+  const s = ((team.name || '') + ' ' + (team.sport || '') + ' ' + (team.league || '') + ' ' + title).toLowerCase();
+  if (/nfl|football|seahawk/.test(s))                          return '🏈';
+  if (/mlb|baseball|mariner/.test(s))                         return '⚾';
+  if (/nhl|hockey|kraken/.test(s))                            return '🏒';
+  if (/mls|soccer|sounder/.test(s))                           return '⚽';
+  if (/wnba|nba|basketball|storm|sonic/.test(s))              return '🏀';
+  if (/concert|tour|\blive\b|music|fest(ival)?/.test(s))      return '🎤';
+  if (/comedy|standup|stand-up/.test(s))                      return '🎭';
+  if (/wrestl|wwe/.test(s))                                   return '🤼';
+  if (/boxing|mma|ufc/.test(s))                               return '🥊';
+  if (/rodeo|circus|family show/.test(s))                     return '🎪';
+  return '🎟️';
+}
+
 function renderEvents(events) {
   if (!events.length) {
     document.getElementById('events-list').innerHTML =
@@ -1588,7 +1603,7 @@ function renderEvents(events) {
         </div>
         <div class="event-bar" style="background:${ev.team.color}"></div>
         <div class="event-body">
-          <div class="event-matchup">${ev.team.name} vs. ${ev.opponent}</div>
+          <div class="event-matchup">${getSportEmoji(ev.team, ev.opponent)} ${ev.team.name} vs. ${ev.opponent}</div>
           <div class="event-sub">${ev.venue} &nbsp;&middot;&nbsp; ${time}</div>
         </div>
         <div class="event-badge ${bCls}">${impact}</div>
