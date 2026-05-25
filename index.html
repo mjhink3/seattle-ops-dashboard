@@ -551,18 +551,11 @@
     /* ── EXTRAS GRID: single column stacked ── */
     #extras-grid { grid-template-columns: 1fr; }
 
-    /* ── LINK LIGHT RAIL: show 1 Line only, hide others ── */
+    /* ── LINK LIGHT RAIL: all lines stacked vertically ── */
     .transit-cols-grid { display: block; }
-    .transit-route-col { display: none; }
-    .transit-route-col:first-child { display: block; border-right: none; min-width: 0; }
-    #transit-content::after {
-      content: 'Open full site for all Link lines';
-      display: block;
-      font-size: 9px;
-      color: var(--text-dim);
-      padding: 6px 10px;
-      border-top: 1px solid var(--border);
-    }
+    .transit-route-col { display: block; width: 100%; border-right: none; border-bottom: 1px solid var(--border); min-width: 0; }
+    .transit-route-col:last-child { border-bottom: none; }
+    .transit-stops-scroll { max-height: none; overflow-y: visible; }
 
     /* ── QUICK LINKS: 2-col grid ── */
     #links-grid { grid-template-columns: repeat(2, 1fr); }
