@@ -2556,15 +2556,7 @@ const LINK_MAP_STNS = [
   {n:'Bellevue Downtown',x:505,y:243, ln:'2 Line',ix:false,ls:'a'},
   {n:'Overlake Village', x:565,y:228, ln:'2 Line',ix:false,ls:'a'},
   {n:'Redmond Technology',x:625,y:213,ln:'2 Line',ix:false,ls:'a'},
-  {n:'Downtown Redmond', x:685,y:200, ln:'2 Line',ix:false,ls:'a'},
-  // T Line (separate Tacoma section at x=420)
-  {n:'Hilltop District', x:420,y:262, ln:'T Line',ix:false,ls:'r'},
-  {n:'St Joseph',        x:420,y:282, ln:'T Line',ix:false,ls:'l'},
-  {n:'Old City Hall',    x:420,y:302, ln:'T Line',ix:false,ls:'r'},
-  {n:'Convention Ctr',   x:420,y:322, ln:'T Line',ix:false,ls:'l'},
-  {n:'Theater District', x:420,y:342, ln:'T Line',ix:false,ls:'r'},
-  {n:'Stadium District', x:420,y:362, ln:'T Line',ix:false,ls:'l'},
-  {n:'Tacoma Dome',      x:420,y:382, ln:'T Line',ix:false,ls:'r'},
+  {n:'Downtown Redmond', x:700,y:200, ln:'2 Line',ix:false,ls:'a'},
 ];
 
 function lmLatToY(lat) {
@@ -2610,13 +2602,8 @@ function renderLinkMap(byLine) {
 
   // --- Schematic lines ---
   const line1 = `<line x1="200" y1="20" x2="200" y2="435" stroke="#00a1de" stroke-width="4" stroke-linecap="round"/>`;
-  const l2pts  = [[200,245],[265,258],[325,258],[385,258],[445,258],[505,243],[565,228],[625,213],[685,200]].map(p=>p.join(',')).join(' ');
+  const l2pts  = [[200,245],[265,258],[325,258],[385,258],[445,258],[505,243],[565,228],[625,213],[700,200]].map(p=>p.join(',')).join(' ');
   const line2 = `<polyline points="${l2pts}" stroke="#e31837" stroke-width="4" fill="none" stroke-linejoin="round" stroke-linecap="round"/>`;
-  const lineT = `<line x1="420" y1="262" x2="420" y2="382" stroke="#6f2c91" stroke-width="4" stroke-linecap="round"/>`;
-
-  // T Line area callout box
-  const tBox = `<rect x="380" y="252" width="80" height="140" rx="4" fill="rgba(111,44,145,0.06)" stroke="#6f2c91" stroke-width="1" stroke-dasharray="4,3"/>
-    <text x="420" y="246" font-family="monospace" font-size="8" fill="#9a6fb0" text-anchor="middle" font-weight="700">TACOMA</text>`;
 
   // --- Station dots + labels ---
   const dots = LINK_MAP_STNS.map((s, idx) => {
@@ -2662,23 +2649,24 @@ function renderLinkMap(byLine) {
     : `<text x="16" y="452" font-family="monospace" font-size="8" fill="var(--text-dim)">${totalVehicles} active train${totalVehicles>1?'s':''} · positions updated every 60s</text>`;
 
   const legend = `<g>
-    <rect x="10" y="406" width="200" height="38" rx="3" fill="rgba(0,0,0,0.55)" stroke="var(--border)" stroke-width="1"/>
+    <rect x="10" y="406" width="160" height="38" rx="3" fill="rgba(0,0,0,0.55)" stroke="var(--border)" stroke-width="1"/>
     <rect x="16" y="414" width="12" height="7" rx="1" fill="#00a1de"/><text x="32" y="421" font-family="monospace" font-size="8" fill="var(--text)">1 Line</text>
     <rect x="80" y="414" width="12" height="7" rx="1" fill="#e31837"/><text x="96" y="421" font-family="monospace" font-size="8" fill="var(--text)">2 Line</text>
-    <rect x="148" y="414" width="12" height="7" rx="1" fill="#6f2c91"/><text x="164" y="421" font-family="monospace" font-size="8" fill="var(--text)">T Line</text>
     <rect x="16" y="427" width="12" height="7" rx="1" fill="var(--border)"/><text x="14" y="430" font-family="monospace" font-size="8" fill="#fff" text-anchor="middle">▶</text>
     <text x="32" y="434" font-family="monospace" font-size="7" fill="var(--text-dim)">= live train (geographically placed)</text>
     ${noData}
   </g>`;
 
+  const tLineNote = `<text x="${W/2}" y="${H-4}" font-family="monospace" font-size="8" fill="var(--text-dim)" text-anchor="middle">T Line (Tacoma Link) operates as a separate system · not shown</text>`;
+
   el.innerHTML = `<svg width="100%" viewBox="0 0 ${W} ${H}" style="display:block;background:var(--bg2)">
     <rect width="${W}" height="${H}" fill="var(--bg2)"/>
-    ${tBox}
-    ${line1}${line2}${lineT}
+    ${line1}${line2}
     ${dots}
     ${regions}
     ${trains}
     ${legend}
+    ${tLineNote}
   </svg>`;
 }
 
@@ -3342,7 +3330,7 @@ async function init() {
   await fetchTransit();
   renderMetroSchedule();
   setDot('metro-dot', 'amber');
-  setTimeout(fetchLinkVehicles, 5000);
+  setTimeout(fetchLinkVehicles, 10000);
   fetchTravelTimes();
   fetchScenicCams();
   fetchEvents();
