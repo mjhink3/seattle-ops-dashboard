@@ -2424,9 +2424,12 @@ const LINK_KEY_STOPS = LINK_LINES.flatMap(line =>
   line.stations.filter(s => s.stopId).map(s => ({ id: s.stopId, name: s.name }))
 );
 
+let _transitArrivals = [];
+
 async function fetchTransit() {
   try {
     const arrivalMap = new Map();
+    const rawArrivals = [];
 
     for (let i = 0; i < LINK_KEY_STOPS.length; i++) {
       if (i > 0) await new Promise(r => setTimeout(r, 300));
@@ -2435,9 +2438,9 @@ async function fetchTransit() {
         const d = await obaFetch(
           `/arrivals-and-departures-for-stop/${encodeURIComponent(id)}.json?minutesBefore=1&minutesAfter=60`
         );
-        const arrs = (d.entry?.arrivalsAndDepartures || [])
-          .slice(0, 4)
-          .map(a => {
+        const rawArrs = d.entry?.arrivalsAndDepartures || [];
+        rawArrivals.push(...rawArrs);
+        const arrs = rawArrs.slice(0, 4).map(a => {
             const ms   = a.predictedArrivalTime || a.scheduledArrivalTime || 0;
             const mins = Math.max(0, Math.round((ms - Date.now()) / 60000));
             return { mins, sched: !a.predictedArrivalTime, dest: a.tripHeadsign || '' };
@@ -2447,6 +2450,8 @@ async function fetchTransit() {
         console.warn(`[Transit] stop ${id} failed:`, e.message);
       }
     }
+
+    _transitArrivals = rawArrivals;
 
     let hasLiveData = false;
     for (const arrs of arrivalMap.values())
@@ -2549,14 +2554,14 @@ const LINK_MAP_STNS = [
   {n:'Kent/Des Moines',  x:200,y:415, ln:'1 Line',ix:false,ls:'l'},
   {n:'Federal Way',      x:200,y:435, ln:'1 Line',ix:false,ls:'r'},
   // 2 Line (branches east from Int'l Dist)
-  {n:'Judkins Park',     x:265,y:258, ln:'2 Line',ix:false,ls:'b'},
-  {n:'Mercer Island',    x:325,y:258, ln:'2 Line',ix:false,ls:'b'},
-  {n:'South Bellevue',   x:385,y:258, ln:'2 Line',ix:false,ls:'b'},
-  {n:'East Main',        x:445,y:258, ln:'2 Line',ix:false,ls:'b'},
-  {n:'Bellevue Downtown',x:505,y:243, ln:'2 Line',ix:false,ls:'a'},
-  {n:'Overlake Village', x:565,y:228, ln:'2 Line',ix:false,ls:'a'},
-  {n:'Redmond Technology',x:625,y:213,ln:'2 Line',ix:false,ls:'a'},
-  {n:'Downtown Redmond', x:700,y:315, ln:'2 Line',ix:false,ls:'r',lx:710,ly:310,lsize:8},
+  {n:'Judkins Park',     x:350,y:395, ln:'2 Line',ix:false,ls:'b'},
+  {n:'Mercer Island',    x:400,y:395, ln:'2 Line',ix:false,ls:'b'},
+  {n:'South Bellevue',   x:450,y:380, ln:'2 Line',ix:false,ls:'b'},
+  {n:'East Main',        x:490,y:365, ln:'2 Line',ix:false,ls:'b'},
+  {n:'Bellevue Downtown',x:520,y:350, ln:'2 Line',ix:false,ls:'b'},
+  {n:'Overlake Village', x:555,y:330, ln:'2 Line',ix:false,ls:'b'},
+  {n:'Redmond Technology',x:590,y:315,ln:'2 Line',ix:false,ls:'b'},
+  {n:'Downtown Redmond', x:615,y:300, ln:'2 Line',ix:false,ls:'a',lx:580,ly:290,lsize:8},
 ];
 
 function lmLatToY(lat) {
@@ -2576,45 +2581,29 @@ function lmVehicleArrow(headsign, lineName) {
 
 async function fetchLinkVehicles() {
   const ROUTE_MAP = {
-    '1_100479': { name:'1 Line', color:'#00a1de' },
-    '1_102576': { name:'2 Line', color:'#e31837' },
+    '40_100479': { name:'1 Line', color:'#00a1de' },
+    '40_102576': { name:'2 Line', color:'#e31837' },
   };
-  const DIR_ARROW = {
-    '1 Line': { 0:'↑', 1:'↓' },
-    '2 Line': { 0:'→', 1:'←' },
-  };
-  const GTFS_URLS = [
-    'https://corsproxy.io/?https://s3.amazonaws.com/kcm-gtfs/Sound_Transit_GTFS-RT/VehiclePositions.json',
-    'https://corsproxy.io/?https://www.soundtransit.org/GTFS-RT/VehiclePositions.json',
-  ];
-
-  let entities = null;
-  for (const url of GTFS_URLS) {
-    try {
-      const res = await fetch(url);
-      if (!res.ok) continue;
-      const data = await res.json();
-      const list = data.entity || data.response?.entity || [];
-      if (list.length) { entities = list; break; }
-    } catch(e) {
-      console.warn('[LinkMap] GTFS-RT failed:', url, e.message);
-    }
-  }
 
   const byLine = { '1 Line': [], '2 Line': [] };
-  if (entities) {
-    for (const entity of entities) {
-      const v = entity.vehicle;
-      if (!v?.position?.latitude || !v?.position?.longitude) continue;
-      const info = ROUTE_MAP[v.trip?.route_id];
-      if (!info) continue;
-      const dir = v.trip?.direction_id;
-      const arrow = (dir !== undefined && DIR_ARROW[info.name]) ? (DIR_ARROW[info.name][dir] || '·') : '·';
-      byLine[info.name].push({ lat: v.position.latitude, lon: v.position.longitude, arrow, color: info.color });
-    }
+  const seen = new Set();
+
+  for (const a of _transitArrivals) {
+    const pos = a.tripStatus?.position;
+    if (!pos?.lat || !pos?.lon) continue;
+    const info = ROUTE_MAP[a.routeId];
+    if (!info) continue;
+    const tripId = a.tripId || a.tripStatus?.activeTripId;
+    if (tripId && seen.has(tripId)) continue;
+    if (tripId) seen.add(tripId);
+    const h = (a.tripHeadsign || '').toLowerCase();
+    let arrow = '·';
+    if (info.name === '1 Line') arrow = (h.includes('lynnwood') || h.includes('northgate') || h.includes('shoreline') || h.includes('mountlake')) ? '↑' : '↓';
+    if (info.name === '2 Line') arrow = h.includes('redmond') ? '→' : '←';
+    byLine[info.name].push({ lat: pos.lat, lon: pos.lon, arrow, color: info.color });
   }
 
-  console.log(`[LinkMap] 1 Line: ${byLine['1 Line'].length}, 2 Line: ${byLine['2 Line'].length} vehicles`);
+  console.log(`[LinkMap] from arrivals: 1 Line: ${byLine['1 Line'].length}, 2 Line: ${byLine['2 Line'].length}`);
   renderLinkMap(byLine);
   const tsEl = document.getElementById('link-map-ts');
   if (tsEl) tsEl.textContent = `Updated ${ts()}`;
@@ -2629,7 +2618,7 @@ function renderLinkMap(byLine) {
 
   // --- Schematic lines ---
   const line1 = `<line x1="200" y1="20" x2="200" y2="435" stroke="#00a1de" stroke-width="4" stroke-linecap="round"/>`;
-  const l2pts  = [[200,245],[265,258],[325,258],[385,258],[445,258],[505,243],[565,228],[625,213],[700,315]].map(p=>p.join(',')).join(' ');
+  const l2pts  = [[300,395],[350,395],[400,395],[450,380],[490,365],[520,350],[555,330],[590,315],[615,300]].map(p=>p.join(',')).join(' ');
   const line2 = `<polyline points="${l2pts}" stroke="#e31837" stroke-width="4" fill="none" stroke-linejoin="round" stroke-linecap="round"/>`;
 
   // --- Station dots + labels ---
