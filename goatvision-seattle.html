@@ -2784,21 +2784,20 @@ function renderLinkMap(byLine) {
     }).join('');
   }).join('');
 
-  // --- Legend ---
-  const statusLine = totalVehicles === 0
-    ? `<text x="16" y="452" font-family="monospace" font-size="8" fill="var(--text-dim)">No live vehicle data available</text>`
-    : `<text x="16" y="452" font-family="monospace" font-size="8" fill="var(--text-dim)">${totalVehicles} active train${totalVehicles>1?'s':''} on 1 Line · 2 Line positions unavailable · updated every 60s</text>`;
-
+  // --- Legend (top-right) ---
   const legend = `<g>
-    <rect x="10" y="406" width="160" height="38" rx="3" fill="rgba(0,0,0,0.55)" stroke="var(--border)" stroke-width="1"/>
-    <rect x="16" y="414" width="12" height="7" rx="1" fill="#00a1de"/><text x="32" y="421" font-family="monospace" font-size="8" fill="var(--text)">1 Line</text>
-    <rect x="80" y="414" width="12" height="7" rx="1" fill="#e31837"/><text x="96" y="421" font-family="monospace" font-size="8" fill="var(--text-dim)" font-style="italic">2 Line · positions unavailable via OBA</text>
-    <rect x="16" y="427" width="12" height="7" rx="1" fill="var(--border)"/><text x="14" y="430" font-family="monospace" font-size="8" fill="#fff" text-anchor="middle">▶</text>
-    <text x="32" y="434" font-family="monospace" font-size="7" fill="var(--text-dim)">= live train (geographically placed)</text>
-    ${statusLine}
+    <rect x="430" y="15" width="282" height="58" rx="3" fill="rgba(0,0,0,0.55)" stroke="var(--border)" stroke-width="1"/>
+    <rect x="438" y="23" width="12" height="7" rx="1" fill="#00a1de"/><text x="454" y="30" font-family="monospace" font-size="8" fill="var(--text)">1 Line</text>
+    <rect x="438" y="41" width="12" height="7" rx="1" fill="#e31837"/><text x="454" y="48" font-family="monospace" font-size="8" fill="var(--text-dim)" font-style="italic">2 Line · positions unavailable via OBA</text>
+    <rect x="438" y="59" width="12" height="7" rx="1" fill="var(--border)"/><text x="444" y="66" font-family="monospace" font-size="8" fill="#fff" text-anchor="middle">▶</text>
+    <text x="454" y="66" font-family="monospace" font-size="7" fill="var(--text-dim)">= live train (geographically placed)</text>
   </g>`;
 
-  const tLineNote = `<text x="${W/2}" y="${H-4}" font-family="monospace" font-size="8" fill="var(--text-dim)" text-anchor="middle">T Line (Tacoma Link) operates as a separate system · not shown</text>`;
+  const tLineNote = `<text x="${W/2}" y="445" font-family="monospace" font-size="8" fill="var(--text-dim)" text-anchor="middle">T Line (Tacoma Link) operates as a separate system · not shown</text>`;
+
+  const statusLine = totalVehicles === 0
+    ? `<text x="${W/2}" y="455" font-family="monospace" font-size="8" fill="var(--text-dim)" text-anchor="middle">No live vehicle data available</text>`
+    : `<text x="${W/2}" y="455" font-family="monospace" font-size="8" fill="var(--text-dim)" text-anchor="middle">${totalVehicles} active train${totalVehicles>1?'s':''} on 1 Line · 2 Line positions unavailable · updated every 60s</text>`;
 
   el.innerHTML = `<svg width="100%" viewBox="0 0 ${W} ${H}" style="display:block;background:var(--bg2)">
     <rect width="${W}" height="${H}" fill="var(--bg2)"/>
@@ -2808,6 +2807,7 @@ function renderLinkMap(byLine) {
     ${trains}
     ${legend}
     ${tLineNote}
+    ${statusLine}
   </svg>`;
 }
 
