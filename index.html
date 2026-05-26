@@ -2729,31 +2729,27 @@ async function fetchLinkVehicles() {
   }
 
   // 2 Line positions from direct OBA vehicles-for-route fetch
-  // Try both agency prefixes — 2 Line may use '1_' (Sound Transit) instead of '40_' (KC Metro)
-  for (const routeId of ['40_102576', '1_102576']) {
-    try {
-      console.log(`[LinkMap] fetching 2 Line vehicles (routeId=${routeId})...`);
-      await new Promise(r => setTimeout(r, 1000));
-      const res = await fetch(
-        `https://api.pugetsound.onebusaway.org/api/where/vehicles-for-route/${routeId}.json?key=TEST`
-      );
-      console.log(`[LinkMap] 2 Line raw response status (${routeId}):`, res.status);
-      if (res.ok) {
-        const data = await res.json();
-        const vehicles = data.data?.list || [];
-        console.log(`[LinkMap] 2 Line vehicles count (${routeId}):`, vehicles.length);
-        for (const v of vehicles) {
-          const lat = v.location?.lat;
-          const lon = v.location?.lon;
-          if (!lat || !lon) continue;
-          const headsign = v.tripStatus?.headsign || '';
-          const arrow = /redmond/i.test(headsign) ? '→' : '←';
-          byLine['2 Line'].push({ lat, lon, color: '#e31837', arrow });
-        }
-        if (vehicles.length > 0) break; // found vehicles — no need to try other prefix
+  try {
+    console.log('[LinkMap] fetching 2 Line vehicles (routeId=40_2LINE)...');
+    await new Promise(r => setTimeout(r, 1000));
+    const res = await fetch(
+      `https://api.pugetsound.onebusaway.org/api/where/vehicles-for-route/40_2LINE.json?key=TEST`
+    );
+    console.log('[LinkMap] 2 Line raw response status:', res.status);
+    if (res.ok) {
+      const data = await res.json();
+      const vehicles = data.data?.list || [];
+      console.log('[LinkMap] 2 Line vehicles count:', vehicles.length);
+      for (const v of vehicles) {
+        const lat = v.location?.lat;
+        const lon = v.location?.lon;
+        if (!lat || !lon) continue;
+        const headsign = v.tripStatus?.headsign || '';
+        const arrow = /redmond/i.test(headsign) ? '→' : '←';
+        byLine['2 Line'].push({ lat, lon, color: '#e31837', arrow });
       }
-    } catch(e) { console.warn(`[LinkMap] 2 Line fetch failed (${routeId}):`, e.message); }
-  }
+    }
+  } catch(e) { console.warn('[LinkMap] 2 Line fetch failed:', e.message); }
 
   console.log(`[LinkMap] 1 Line: ${byLine['1 Line'].length}, 2 Line: ${byLine['2 Line'].length}`);
   renderLinkMap(byLine);
@@ -3622,22 +3618,6 @@ async function init() {
     if (ttFetchedAt) document.getElementById('tt-ts').textContent=`Refreshed ${ts(ttFetchedAt)} · ${allTravelTimes.length} routes`;
   }, 30000);
 
-  // One-time diagnostic: find correct OBA route IDs for Link Light Rail
-  setTimeout(async () => {
-    try {
-      const res = await fetch('https://api.pugetsound.onebusaway.org/api/where/routes-for-agency/40.json?key=TEST');
-      const data = await res.json();
-      const routes = data.data?.list || [];
-      const linkRoutes = routes.filter(r =>
-        r.shortName?.includes('Line') ||
-        r.longName?.toLowerCase().includes('link') ||
-        r.shortName === '1' || r.shortName === '2'
-      );
-      console.log('[OBA] Link routes found:', JSON.stringify(linkRoutes.map(r => ({id: r.id, short: r.shortName, long: r.longName}))));
-    } catch(e) {
-      console.log('[OBA] route lookup failed:', e.message);
-    }
-  }, 15000);
 }
 
 document.addEventListener('DOMContentLoaded', init);
