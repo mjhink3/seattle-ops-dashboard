@@ -1832,7 +1832,7 @@ function renderIncidents(alerts) {
 const FERRY_ROUTE_KEYWORDS = [
   { name:'Mukilteo / Clinton',                     keywords:['mukilteo','clinton'] },
   { name:'Seattle / Bainbridge Island',             keywords:['seattle','bainbridge island'] },
-  { name:'Fauntleroy / Vashon Island / Southworth', keywords:['fauntleroy','vashon island','southworth'] },
+  { name:'Fauntleroy / Vashon Island / Southworth', keywords:['fauntleroy','vashon island','southworth'], matchAny:true },
   { name:'Point Defiance / Tahlequah',              keywords:['point defiance','tahlequah'] },
 ];
 
@@ -1859,7 +1859,10 @@ function matchRoute(vessel) {
   const arr = (vessel.ArrivingTerminalName||'').toLowerCase();
   const combined = dep + ' ' + arr;
   for (const route of FERRY_ROUTE_KEYWORDS) {
-    if (route.keywords.every(k => combined.includes(k))) return route.name;
+    const matched = route.matchAny
+      ? route.keywords.some(k => combined.includes(k))
+      : route.keywords.every(k => combined.includes(k));
+    if (matched) return route.name;
   }
   return null;
 }
@@ -1910,10 +1913,15 @@ function renderFerry(vessels) {
     const vs = byRoute[route.name];
     let inner = '';
 
-    if (!vs.length) {
+    // For triangle routes, skip vessels where the API hasn't populated both terminal names yet
+    const validVs = route.matchAny
+      ? vs.filter(v => v.DepartingTerminalName && v.ArrivingTerminalName)
+      : vs;
+
+    if (!validVs.length) {
       inner = `<div class="ferry-no-data">No vessel data — see wsdot.com/ferries</div>`;
     } else {
-      inner = vs.map(v => {
+      inner = validVs.map(v => {
         const atDock = !!v.AtDock;
         const name   = v.VesselName || 'Vessel';
         const dep    = v.DepartingTerminalName || '';
