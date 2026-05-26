@@ -2556,7 +2556,7 @@ const LINK_MAP_STNS = [
   {n:'Bellevue Downtown',x:505,y:243, ln:'2 Line',ix:false,ls:'a'},
   {n:'Overlake Village', x:565,y:228, ln:'2 Line',ix:false,ls:'a'},
   {n:'Redmond Technology',x:625,y:213,ln:'2 Line',ix:false,ls:'a'},
-  {n:'Downtown Redmond', x:700,y:200, ln:'2 Line',ix:false,ls:'a'},
+  {n:'Downtown Redmond', x:700,y:315, ln:'2 Line',ix:false,ls:'r',lx:710,ly:310,lsize:8},
 ];
 
 function lmLatToY(lat) {
@@ -2575,19 +2575,46 @@ function lmVehicleArrow(headsign, lineName) {
 }
 
 async function fetchLinkVehicles() {
-  const byLine = {};
-  for (let i = 0; i < LINK_VEHICLE_ROUTES.length; i++) {
-    if (i > 0) await new Promise(r => setTimeout(r, 500));
-    const route = LINK_VEHICLE_ROUTES[i];
+  const ROUTE_MAP = {
+    '1_100479': { name:'1 Line', color:'#00a1de' },
+    '1_102576': { name:'2 Line', color:'#e31837' },
+  };
+  const DIR_ARROW = {
+    '1 Line': { 0:'↑', 1:'↓' },
+    '2 Line': { 0:'→', 1:'←' },
+  };
+  const GTFS_URLS = [
+    'https://corsproxy.io/?https://s3.amazonaws.com/kcm-gtfs/Sound_Transit_GTFS-RT/VehiclePositions.json',
+    'https://corsproxy.io/?https://www.soundtransit.org/GTFS-RT/VehiclePositions.json',
+  ];
+
+  let entities = null;
+  for (const url of GTFS_URLS) {
     try {
-      const d = await obaFetch(`/vehicles-for-route/${encodeURIComponent(route.routeId)}.json?includeStatus=true`);
-      byLine[route.name] = (d.list || []).filter(v => v.location?.lat && v.location?.lon);
-      console.log(`[LinkMap] ${route.name}: ${byLine[route.name].length} vehicles`);
+      const res = await fetch(url);
+      if (!res.ok) continue;
+      const data = await res.json();
+      const list = data.entity || data.response?.entity || [];
+      if (list.length) { entities = list; break; }
     } catch(e) {
-      console.warn(`[LinkMap] ${route.name} failed:`, e.message);
-      byLine[route.name] = [];
+      console.warn('[LinkMap] GTFS-RT failed:', url, e.message);
     }
   }
+
+  const byLine = { '1 Line': [], '2 Line': [] };
+  if (entities) {
+    for (const entity of entities) {
+      const v = entity.vehicle;
+      if (!v?.position?.latitude || !v?.position?.longitude) continue;
+      const info = ROUTE_MAP[v.trip?.route_id];
+      if (!info) continue;
+      const dir = v.trip?.direction_id;
+      const arrow = (dir !== undefined && DIR_ARROW[info.name]) ? (DIR_ARROW[info.name][dir] || '·') : '·';
+      byLine[info.name].push({ lat: v.position.latitude, lon: v.position.longitude, arrow, color: info.color });
+    }
+  }
+
+  console.log(`[LinkMap] 1 Line: ${byLine['1 Line'].length}, 2 Line: ${byLine['2 Line'].length} vehicles`);
   renderLinkMap(byLine);
   const tsEl = document.getElementById('link-map-ts');
   if (tsEl) tsEl.textContent = `Updated ${ts()}`;
@@ -2602,7 +2629,7 @@ function renderLinkMap(byLine) {
 
   // --- Schematic lines ---
   const line1 = `<line x1="200" y1="20" x2="200" y2="435" stroke="#00a1de" stroke-width="4" stroke-linecap="round"/>`;
-  const l2pts  = [[200,245],[265,258],[325,258],[385,258],[445,258],[505,243],[565,228],[625,213],[700,200]].map(p=>p.join(',')).join(' ');
+  const l2pts  = [[200,245],[265,258],[325,258],[385,258],[445,258],[505,243],[565,228],[625,213],[700,315]].map(p=>p.join(',')).join(' ');
   const line2 = `<polyline points="${l2pts}" stroke="#e31837" stroke-width="4" fill="none" stroke-linejoin="round" stroke-linecap="round"/>`;
 
   // --- Station dots + labels ---
@@ -2616,7 +2643,10 @@ function renderLinkMap(byLine) {
     else if (s.ls==='l') { tx=s.x-10; ty=s.y+3;  anchor='end';   }
     else if (s.ls==='b') { tx=s.x;    ty=s.y+14; anchor='middle';}
     else                 { tx=s.x;    ty=s.y-8;  anchor='middle';}
-    const label = `<text x="${tx}" y="${ty}" font-family="monospace" font-size="7" fill="var(--text-dim)" text-anchor="${anchor}">${s.n}</text>`;
+    if (s.lx !== undefined) tx = s.lx;
+    if (s.ly !== undefined) ty = s.ly;
+    const fsize = s.lsize || 7;
+    const label = `<text x="${tx}" y="${ty}" font-family="monospace" font-size="${fsize}" fill="var(--text-dim)" text-anchor="${anchor}">${s.n}</text>`;
     return dot + label;
   }).join('');
 
@@ -2628,17 +2658,15 @@ function renderLinkMap(byLine) {
 
   // --- Live vehicle icons ---
   let totalVehicles = 0;
-  const trains = LINK_VEHICLE_ROUTES.map(route => {
-    const vehicles = byLine[route.name] || [];
+  const trains = Object.entries(byLine).map(([lineName, vehicles]) => {
     totalVehicles += vehicles.length;
     return vehicles.map(v => {
-      const vx = Math.round(lmLonToX(v.location.lon));
-      const vy = Math.round(lmLatToY(v.location.lat));
+      const vx = Math.round(lmLonToX(v.lon));
+      const vy = Math.round(lmLatToY(v.lat));
       if (vx < 5 || vx > W-5 || vy < 5 || vy > H-5) return '';
-      const arrow = lmVehicleArrow(v.tripStatus?.headsign, route.name);
       return `<g class="lm-train" transform="translate(${vx-9},${vy-5})">
-        <rect width="18" height="10" rx="2" fill="${route.color}" class="lm-pulse" opacity="0.95"/>
-        <text x="9" y="8" font-family="monospace" font-size="8" fill="#fff" text-anchor="middle">${arrow}</text>
+        <rect width="18" height="10" rx="2" fill="${v.color}" class="lm-pulse" opacity="0.95"/>
+        <text x="9" y="8" font-family="monospace" font-size="8" fill="#fff" text-anchor="middle">${v.arrow}</text>
       </g>`;
     }).join('');
   }).join('');
