@@ -2461,14 +2461,14 @@ function renderTransit(routeStops, arrivalMap) {
 //  KING COUNTY METRO BUS
 // ╚══════════════════════════════════════════════════════════╝
 const METRO_ROUTES = [
-  { num:'7',   name:'Rainier Ave',            stopId:'1_565'   },
-  { num:'40',  name:'South Lake Union',        stopId:'1_2010'  },
+  { num:'7',   name:'Rainier Ave',            stopId:'1_530'   },
+  { num:'40',  name:'South Lake Union',        stopId:'1_2375'  },
   { num:'44',  name:'Ballard / Montlake',      stopId:'1_26860' },
   { num:'48',  name:'U District / Col. City',  stopId:'1_29270' },
-  { num:'101', name:'Renton Express',          stopId:'1_619'   },
-  { num:'150', name:'Kent / Southcenter',      stopId:'1_619'   },
-  { num:'255', name:'Kirkland Express',        stopId:'1_490'   },
-  { num:'545', name:'Redmond Express',         stopId:'1_490'   },
+  { num:'101', name:'Renton Express',          stopId:'1_530'   },
+  { num:'150', name:'Kent / Southcenter',      stopId:'1_530'   },
+  { num:'255', name:'Kirkland Express',        stopId:'1_431'   },
+  { num:'545', name:'Redmond Express',         stopId:'1_431'   },
 ];
 
 async function fetchMetro() {
@@ -2483,8 +2483,14 @@ async function fetchMetro() {
       return { sid, arrs: d.entry?.arrivalsAndDepartures || [] };
     }));
 
-    for (const r of results)
-      if (r.status === 'fulfilled') stopData.set(r.value.sid, r.value.arrs);
+    for (const r of results) {
+      if (r.status === 'fulfilled') {
+        stopData.set(r.value.sid, r.value.arrs);
+        if (r.value.sid === '1_530') {
+          console.log('[Metro] raw arrivalsAndDepartures for 1_530:', JSON.stringify(r.value.arrs.slice(0, 5), null, 2));
+        }
+      }
+    }
 
     const now = Date.now();
     const rows = METRO_ROUTES.map(route => {
