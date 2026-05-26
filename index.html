@@ -2561,14 +2561,14 @@ const LINK_MAP_STNS = [
   {n:'Bellevue Downtown',x:520,y:350, ln:'2 Line',ix:false,ls:'b'},
   {n:'Overlake Village', x:555,y:330, ln:'2 Line',ix:false,ls:'b'},
   {n:'Redmond Technology',x:590,y:315,ln:'2 Line',ix:false,ls:'b'},
-  {n:'Downtown Redmond', x:615,y:300, ln:'2 Line',ix:false,ls:'a',lx:580,ly:290,lsize:8},
+  {n:'Downtown Redmond', x:615,y:300, ln:'2 Line',ix:false,ls:'a',lx:580,ly:445,lsize:8},
 ];
 
 function lmLatToY(lat) {
-  return 20 + (47.92 - lat) / (47.92 - 47.15) * (435 - 20);
+  return ((47.92 - lat) / (47.92 - 47.15)) * 620 + 30;
 }
 function lmLonToX(lon) {
-  return 100 + (lon - (-122.45)) / ((-122.10) - (-122.45)) * (600);
+  return ((lon - (-122.45)) / ((-122.10) - (-122.45))) * 520 + 80;
 }
 
 function lmVehicleArrow(headsign, lineName) {
@@ -2642,8 +2642,7 @@ function renderLinkMap(byLine) {
   // --- Region labels ---
   const regions = `
     <text x="200" y="12" font-family="monospace" font-size="8" fill="#00a1de" text-anchor="middle" font-weight="700" opacity="0.7">SEATTLE / LYNNWOOD</text>
-    <text x="200" y="445" font-family="monospace" font-size="8" fill="#00a1de" text-anchor="middle" font-weight="700" opacity="0.7">FEDERAL WAY</text>
-    <text x="685" y="192" font-family="monospace" font-size="8" fill="#e31837" text-anchor="end" font-weight="700" opacity="0.7">REDMOND</text>`;
+    <text x="200" y="445" font-family="monospace" font-size="8" fill="#00a1de" text-anchor="middle" font-weight="700" opacity="0.7">FEDERAL WAY</text>`;
 
   // --- Live vehicle icons ---
   let totalVehicles = 0;
