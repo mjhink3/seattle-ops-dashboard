@@ -1434,6 +1434,9 @@ function setDot(id, color) {
 function parseDotNetDate(s) {
   const m = (s||'').match(/\d+/); return m ? new Date(parseInt(m[0])) : null;
 }
+function addTargetBlank(html) {
+  return (html || '').replace(/<a\s+(?![^>]*target=)/gi, '<a target="_blank" rel="noopener noreferrer" ');
+}
 
 // ╔══════════════════════════════════════════════════════════╗
 //  SYSTEM CLOCK
@@ -1684,7 +1687,7 @@ function renderNWSAlerts(alerts) {
     const cls = sev==='Extreme'?'nws-extreme':sev==='Severe'?'nws-severe':sev==='Moderate'?'nws-moderate':'nws-minor';
     const exp = p.expires ? new Date(p.expires).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true}) : '—';
     const onset = p.onset  ? new Date(p.onset).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true}) : null;
-    const headline = (p.headline || p.description?.split('\n')[0] || '').slice(0, 180);
+    const headline = addTargetBlank((p.headline || p.description?.split('\n')[0] || '').slice(0, 180));
     return `<div class="nws-alert-item">
       <div>
         <div class="nws-sev-badge ${cls}">${sev}</div>
@@ -1811,7 +1814,7 @@ function renderIncidents(alerts) {
   const sorted=[...alerts].sort((a,b)=>order[parseSev(a)]-order[parseSev(b)]);
   document.getElementById('incidents-list').innerHTML = sorted.slice(0,30).map(a => {
     const sev=parseSev(a), road=a.RoadName||'—', dir=a.DirectionText||'';
-    const desc=a.HeadlineDescription||a.ExtendedDescription||'No description';
+    const desc=addTargetBlank(a.HeadlineDescription||a.ExtendedDescription||'No description');
     const loc=[a.StartRoadwayLocation?.Description,a.EndRoadwayLocation?.Description].filter(Boolean).join(' → ')||road;
     let startTime='';
     if (a.StartTime){const m=a.StartTime.match(/\d+/);if(m)startTime=new Date(parseInt(m[0])).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});}
@@ -2512,14 +2515,11 @@ const LINK_LINES = [
     endpoints: 'Lynnwood ↔ Federal Way',
     note: 'via Downtown Seattle & SeaTac',
     stations: [
-      { name: 'Lynnwood City Center', stopId: '40_99432'  },
-      { name: 'Northgate',            stopId: '40_99260'  },
-      { name: 'U District',           stopId: '40_99111'  },
-      { name: 'Capitol Hill',         stopId: '40_99101'  },
-      { name: 'Westlake',             stopId: '40_990006' },
-      { name: 'SODO',                 stopId: '40_99903'  },
-      { name: 'SeaTac / Airport',     stopId: '40_99904'  },
-      { name: 'Federal Way',          stopId: '40_99507'  },
+      { name: 'Northgate',       stopId: '40_99260'  },
+      { name: 'U District',      stopId: '40_99111'  },
+      { name: 'Capitol Hill',    stopId: '40_99101'  },
+      { name: 'Westlake',        stopId: '40_990006' },
+      { name: 'SeaTac / Airport',stopId: '40_99904'  },
     ]
   },
   {
@@ -2527,12 +2527,8 @@ const LINK_LINES = [
     endpoints: 'Redmond ↔ Intl District',
     note: 'via Bellevue',
     stations: [
-      { name: 'Downtown Redmond',    stopId: '40_99918' },
-      { name: 'Redmond Technology',  stopId: '40_99914' },
-      { name: 'Overlake Village',    stopId: '40_99916' },
-      { name: 'Bellevue Downtown',   stopId: '40_99610' },
-      { name: 'Mercer Island',       stopId: '40_99606' },
-      { name: 'Intl Dist/Chinatown', stopId: '40_99601' },
+      { name: 'Redmond Technology', stopId: '40_99914' },
+      { name: 'Bellevue Downtown',  stopId: '40_99610' },
     ]
   },
   {
@@ -2732,24 +2728,31 @@ async function fetchLinkVehicles() {
   }
 
   // 2 Line positions from direct OBA vehicles-for-route fetch
-  try {
-    await new Promise(r => setTimeout(r, 1000));
-    const res = await fetch(
-      `https://api.pugetsound.onebusaway.org/api/where/vehicles-for-route/40_102576.json?key=TEST`
-    );
-    if (res.ok) {
-      const data = await res.json();
-      const vehicles = data.data?.list || [];
-      for (const v of vehicles) {
-        const lat = v.location?.lat;
-        const lon = v.location?.lon;
-        if (!lat || !lon) continue;
-        const headsign = v.tripStatus?.headsign || '';
-        const arrow = /redmond/i.test(headsign) ? '→' : '←';
-        byLine['2 Line'].push({ lat, lon, color: '#e31837', arrow });
+  // Try both agency prefixes — 2 Line may use '1_' (Sound Transit) instead of '40_' (KC Metro)
+  for (const routeId of ['40_102576', '1_102576']) {
+    try {
+      console.log(`[LinkMap] fetching 2 Line vehicles (routeId=${routeId})...`);
+      await new Promise(r => setTimeout(r, 1000));
+      const res = await fetch(
+        `https://api.pugetsound.onebusaway.org/api/where/vehicles-for-route/${routeId}.json?key=TEST`
+      );
+      console.log(`[LinkMap] 2 Line raw response status (${routeId}):`, res.status);
+      if (res.ok) {
+        const data = await res.json();
+        const vehicles = data.data?.list || [];
+        console.log(`[LinkMap] 2 Line vehicles count (${routeId}):`, vehicles.length);
+        for (const v of vehicles) {
+          const lat = v.location?.lat;
+          const lon = v.location?.lon;
+          if (!lat || !lon) continue;
+          const headsign = v.tripStatus?.headsign || '';
+          const arrow = /redmond/i.test(headsign) ? '→' : '←';
+          byLine['2 Line'].push({ lat, lon, color: '#e31837', arrow });
+        }
+        if (vehicles.length > 0) break; // found vehicles — no need to try other prefix
       }
-    }
-  } catch(e) { /* silent fail */ }
+    } catch(e) { console.warn(`[LinkMap] 2 Line fetch failed (${routeId}):`, e.message); }
+  }
 
   console.log(`[LinkMap] 1 Line: ${byLine['1 Line'].length}, 2 Line: ${byLine['2 Line'].length}`);
   renderLinkMap(byLine);
@@ -3617,6 +3620,23 @@ async function init() {
   setInterval(() => {
     if (ttFetchedAt) document.getElementById('tt-ts').textContent=`Refreshed ${ts(ttFetchedAt)} · ${allTravelTimes.length} routes`;
   }, 30000);
+
+  // One-time diagnostic: find correct OBA route IDs for Link Light Rail
+  setTimeout(async () => {
+    try {
+      const res = await fetch('https://api.pugetsound.onebusaway.org/api/where/routes-for-agency/40.json?key=TEST');
+      const data = await res.json();
+      const routes = data.data?.list || [];
+      const linkRoutes = routes.filter(r =>
+        r.shortName?.includes('Line') ||
+        r.longName?.toLowerCase().includes('link') ||
+        r.shortName === '1' || r.shortName === '2'
+      );
+      console.log('[OBA] Link routes found:', JSON.stringify(linkRoutes.map(r => ({id: r.id, short: r.shortName, long: r.longName}))));
+    } catch(e) {
+      console.log('[OBA] route lookup failed:', e.message);
+    }
+  }, 15000);
 }
 
 document.addEventListener('DOMContentLoaded', init);
