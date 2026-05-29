@@ -1458,7 +1458,7 @@ async function snapshotCondition(category, locationKey, value, rawJson = {}) {
 async function getHistoricalBaseline(category, locationKey) {
   if (!_supa) return null;
   try {
-    const since = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
+    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const { data, error } = await _supa
       .from('condition_snapshots')
       .select('value')
@@ -2630,16 +2630,42 @@ function renderBike(data) {
   const precip = c.precipitation_probability ?? 0;
   const code   = c.weather_code;
 
-  const MAX = 100;
-  const tempScore  = temp>=55&&temp<=75?25:temp>=45&&temp<55?18:temp>=40&&temp<45?10:temp>75&&temp<=85?20:5;
-  const windScore  = wind<=8?25:wind<=15?18:wind<=22?10:wind<=30?5:0;
-  const precipScore= precip<=15?25:precip<=35?18:precip<=55?10:precip<=75?4:0;
-  const wxScore    = wmoSeverity(code)<=0?25:wmoSeverity(code)<=0.3?18:wmoSeverity(code)<=0.5?8:0;
-  const total = tempScore + windScore + precipScore + wxScore;
+  // Time of day — Pacific time
+  const now = new Date();
+  const pacificStr = now.toLocaleString('en-US', { timeZone:'America/Los_Angeles', hour12:false, hour:'2-digit', minute:'2-digit', weekday:'short' });
+  const parts = pacificStr.split(', ');
+  const [hStr, mStr] = (parts[1]||'00:00').split(':');
+  const h = (parseInt(hStr,10) % 24) + parseInt(mStr,10)/60;
+  const dow = { Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6 }[parts[0]] ?? now.getDay();
+  const isWeekday = dow >= 1 && dow <= 5;
+
+  // Time of day score (out of 20) — Seattle-specific patterns
+  let timeScore = 20;
+  let timeLabel = 'Time of day';
+  if (h < 6 || h >= 21) {
+    timeScore = 5;  // dark hours — poor visibility
+    timeLabel = h < 6 ? 'Pre-dawn' : 'After dark';
+  } else if (isWeekday && ((h >= 7.5 && h < 9.5) || (h >= 16 && h < 18.5))) {
+    timeScore = 12; // rush hour — heavy traffic on bike corridors
+    timeLabel = h < 12 ? 'AM rush' : 'PM rush';
+  } else if (h >= 6 && h < 8) {
+    timeScore = 16; // early morning — light traffic, slightly dim
+    timeLabel = 'Early morning';
+  } else if (h >= 18.5 && h < 21) {
+    timeScore = 14; // evening — dimming light
+    timeLabel = 'Evening';
+  }
+
+  // Core 4 factors — rescaled to 20pts each (80 max) + time of day (20) = 100 total
+  const tempScore  = temp>=55&&temp<=75?20:temp>=45&&temp<55?14:temp>=40&&temp<45?8:temp>75&&temp<=85?16:4;
+  const windScore  = wind<=8?20:wind<=15?14:wind<=22?8:wind<=30?4:0;
+  const precipScore= precip<=15?20:precip<=35?14:precip<=55?8:precip<=75?3:0;
+  const wxScore    = wmoSeverity(code)<=0?20:wmoSeverity(code)<=0.3?14:wmoSeverity(code)<=0.5?6:0;
+  const total = tempScore + windScore + precipScore + wxScore + timeScore;
 
   let label, color, verdict;
-  if (total>=75)      { label='GO';      color='sev-green'; verdict='Ideal conditions. Get out there.'; }
-  else if (total>=50) { label='DECENT';  color='sev-green'; verdict='Gear up and ride.'; }
+  if (total>=80)      { label='GO';      color='sev-green'; verdict='Ideal conditions. Get out there.'; }
+  else if (total>=55) { label='DECENT';  color='sev-green'; verdict='Gear up and ride.'; }
   else if (total>=30) { label='ROUGH';   color='sev-amber'; verdict='Doable with rain gear.'; }
   else                { label='STAY IN'; color='sev-red';   verdict='Wait it out.'; }
 
@@ -2657,10 +2683,11 @@ function renderBike(data) {
       <div><div class="bike-label ${color}">${label}</div><div class="bike-verdict">${verdict}</div></div>
     </div>
     <div class="bike-factors">
-      <div class="bike-factor-row"><span class="bike-factor-name">Temperature (${Math.round(temp)}°F)</span>${pips(tempScore,25)}</div>
-      <div class="bike-factor-row"><span class="bike-factor-name">Wind (${Math.round(wind)} mph)</span>${pips(windScore,25)}</div>
-      <div class="bike-factor-row"><span class="bike-factor-name">Precip chance (${precip}%)</span>${pips(precipScore,25)}</div>
-      <div class="bike-factor-row"><span class="bike-factor-name">Sky (${wmoDesc(code)})</span>${pips(wxScore,25)}</div>
+      <div class="bike-factor-row"><span class="bike-factor-name">Temperature (${Math.round(temp)}°F)</span>${pips(tempScore,20)}</div>
+      <div class="bike-factor-row"><span class="bike-factor-name">Wind (${Math.round(wind)} mph)</span>${pips(windScore,20)}</div>
+      <div class="bike-factor-row"><span class="bike-factor-name">Precip chance (${precip}%)</span>${pips(precipScore,20)}</div>
+      <div class="bike-factor-row"><span class="bike-factor-name">Sky (${wmoDesc(code)})</span>${pips(wxScore,20)}</div>
+      <div class="bike-factor-row"><span class="bike-factor-name">${timeLabel}</span>${pips(timeScore,20)}</div>
     </div>`;
 }
 
@@ -3173,7 +3200,7 @@ async function renderTravelTimes() {
     if (delta===0&&ratio<=1.1) bt='ON TIME';
     const ud = parseDotNetDate(r.TimeUpdated);
     const name = r.Name.replace(/\s*(HOV|EL)\s*$/i,'').trim();
-    const avgDisplay = baseline ? `90d avg: ${baseline.avg}m` : `avg ${avg}m`;
+    const avgDisplay = baseline ? `7d avg: ${baseline.avg}m` : `avg ${avg}m`;
     html+=`<div class="tt-row" id="tt-row-${r.TravelTimeID}" title="${r.Description||r.Name}${ud?' · Updated '+minsAgo(ud):''}">
       <span class="tt-tag">${r._road} ${r._dir}</span>
       <span class="tt-name">${name}</span>
