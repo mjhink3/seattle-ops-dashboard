@@ -1458,7 +1458,7 @@ async function snapshotCondition(category, locationKey, value, rawJson = {}) {
 async function getHistoricalBaseline(category, locationKey) {
   if (!_supa) return null;
   try {
-    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const since = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
     const { data, error } = await _supa
       .from('condition_snapshots')
       .select('value')
@@ -3173,7 +3173,7 @@ async function renderTravelTimes() {
     if (delta===0&&ratio<=1.1) bt='ON TIME';
     const ud = parseDotNetDate(r.TimeUpdated);
     const name = r.Name.replace(/\s*(HOV|EL)\s*$/i,'').trim();
-    const avgDisplay = baseline ? `7d avg: ${baseline.avg}m` : `avg ${avg}m`;
+    const avgDisplay = baseline ? `90d avg: ${baseline.avg}m` : `avg ${avg}m`;
     html+=`<div class="tt-row" id="tt-row-${r.TravelTimeID}" title="${r.Description||r.Name}${ud?' · Updated '+minsAgo(ud):''}">
       <span class="tt-tag">${r._road} ${r._dir}</span>
       <span class="tt-name">${name}</span>
